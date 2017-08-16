@@ -20,10 +20,12 @@ __CONFIG_H5_STK_DIR__ = r'D:\DATA_STK'
 # 股票的除权除息数据
 __CONFIG_H5_STK_DIVIDEND_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'dividend')
 # 股票行业信息
-__CONFIG_H5_STK_SECTOR_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'sector')
+__CONFIG_H5_STK_SECTOR_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'sectorconstituent')
+# 指数权重信息
+__CONFIG_H5_STK_WEIGHT_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'indexconstituent')
 # 股票因子信息
 __CONFIG_H5_STK_FACTOR_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'factor')
-# 交易日数据，请记得每年末更新一下第二年的交易日信息
+# 交易日数据，请每年末更新一下第二年的交易日信息
 __CONFIG_TDAYS_SSE_FILE__ = os.path.join(__CONFIG_H5_STK_DIR__, 'tdays', 'SSE.csv')
 
 # 期货行情数据

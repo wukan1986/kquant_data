@@ -9,8 +9,7 @@ import collections
 import os
 
 import pandas as pd
-from utils.symbol import split_by_dot
-
+from .utils.symbol import split_by_dot
 from .config import __CONFIG_H5_STK_DIR__, __CONFIG_TDX_STK_DIR__, __CONFIG_H5_STK_DIVIDEND_DIR__
 from .future.future import read_h5
 from .processing.utils import filter_dataframe

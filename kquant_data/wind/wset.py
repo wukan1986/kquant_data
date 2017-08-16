@@ -46,7 +46,30 @@ def download_sectorconstituent(w, date, sector, windcode, field='wind_code'):
     return df
 
 
-def read_sectorconstituent(path):
+def download_indexconstituent(w, date, windcode, field='wind_code,i_weight'):
+    """
+    指数权重
+    如果指定日期不是交易日，会返回时前一个交易日的信息
+    :param w:
+    :param windcode:
+    :param date:
+    :return:
+    """
+    param = 'date=%s' % date
+    if windcode:
+        param += ';windcode=%s' % windcode
+    if field:
+        param += ';field=%s' % field
+
+    w.asDateTime = asDateTime
+    w_wset_data = w.wset("indexconstituent", param)
+    df = pd.DataFrame(w_wset_data.Data)
+    df = df.T
+    df.columns = w_wset_data.Fields
+    return df
+
+
+def read_constituent(path):
     """
     读取板块文件
     :param path:
@@ -54,7 +77,7 @@ def read_sectorconstituent(path):
     """
     try:
         df = pd.read_csv(path, encoding='utf-8-sig', parse_dates=True)
-    except (FileNotFoundError, OSError):
+    except:
         return None
     try:
         df['date'] = pd.to_datetime(df['date'])
@@ -75,7 +98,7 @@ def read_sectorconstituent_from_dir(path, key_field='wind_code'):
     for parent, dirnames, filenames in os.walk(path):
         for filename in filenames:
             filepath = os.path.join(parent, filename)
-            curr_df = read_sectorconstituent(filepath)
+            curr_df = read_constituent(filepath)
             # 由于两头数据可能一样，这样处理，只留第一个，可以加快处理速度
             curr_set = set(curr_df[key_field])
             if last_set == curr_set:
@@ -92,30 +115,31 @@ def read_sectorconstituent_from_dir(path, key_field='wind_code'):
     return df
 
 
-def write_sectorconstituent(path, df):
+def write_constituent(path, df):
     df.to_csv(path, encoding='utf-8-sig', date_format='%Y-%m-%d', index=False)
 
 
-def download_indexconstituent(w, date, windcode, field):
+def read_indexconstituent_from_dir(path):
     """
-    指数权重
-    如果指定日期不是交易日，会返回时前一个交易日的信息
-    :param w:
-    :param windcode:
-    :param date:
+    由于权重每天都不一样，只能根据用户指定的日期下载才行
+    :param path:
     :return:
     """
-    param = 'date=%s' % date
-    if windcode:
-        param += ';windcode=%s' % windcode
-    if field:
-        param += ';field=%s' % field
+    last_set = None
+    df = None
+    for parent, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            filepath = os.path.join(parent, filename)
+            curr_df = read_constituent(filepath)
+            # 2016-12-12,有成份新加入，但权重为nan
+            curr_df.fillna(0, inplace=True)
 
-    w.asDateTime = asDateTime
-    w_wset_data = w.wset("indexconstituent", param)
-    df = pd.DataFrame(w_wset_data.Data)
-    df = df.T
-    df.columns = w_wset_data.Fields
+            data_date_str = filename[:-4]
+            curr_df['_datetime_'] = pd.to_datetime(data_date_str)
+            if df is None:
+                df = curr_df
+            else:
+                df = pd.concat([df, curr_df])
     return df
 
 

@@ -8,14 +8,15 @@
 2.在文件上，三个文件一组，三组一样，删中间一个，直到不能删了，退出
 """
 import os
+import shutil
 import pandas as pd
 from datetime import datetime
 
-from ..wind.wset import write_sectorconstituent, read_sectorconstituent, download_sectorconstituent
+from ..wind.wset import write_constituent, read_constituent, download_sectorconstituent, download_indexconstituent
 
 
-def _binsearch_download_sectorconstituent(w, dates, path, file_ext, start, end, sector, windcode, field,
-                                          two_sides=False):
+def _binsearch_download_constituent(w, dates, path, file_ext, start, end, sector, windcode, field,
+                                    two_sides=False, is_indexconstituent=False):
     """
     使用折半法下载
     缺点，数据都下载过来了，中间很多重复的数据
@@ -25,10 +26,10 @@ def _binsearch_download_sectorconstituent(w, dates, path, file_ext, start, end, 
     :param file_ext:
     :param start:
     :param end:
-    :param sector:
+    :param sector:None表示没有权块信息，那就是权重信息了
     :param windcode:
     :param field:
-    :param two_sides:
+    :param two_sides:用在一开始数据下载时补两头
     :return:
     """
     len = end - start
@@ -38,19 +39,25 @@ def _binsearch_download_sectorconstituent(w, dates, path, file_ext, start, end, 
 
     date = dates[start]
     fullpath = os.path.join(path, date + file_ext)
-    df_start = read_sectorconstituent(fullpath)
+    df_start = read_constituent(fullpath)
     if df_start is None:
         print("下载:%s" % date)
-        df_start = download_sectorconstituent(w, date, sector, windcode, field)
-        write_sectorconstituent(fullpath, df_start)
+        if not is_indexconstituent:
+            df_start = download_sectorconstituent(w, date, sector, windcode, field)
+        else:
+            df_start = download_indexconstituent(w, date, windcode, field)
+        write_constituent(fullpath, df_start)
 
     date = dates[end]
     fullpath = os.path.join(path, date + file_ext)
-    df_end = read_sectorconstituent(fullpath)
+    df_end = read_constituent(fullpath)
     if df_end is None:
         print("下载:%s" % date)
-        df_end = download_sectorconstituent(w, date, sector, windcode, field)
-        write_sectorconstituent(fullpath, df_end)
+        if not is_indexconstituent:
+            df_end = download_sectorconstituent(w, date, sector, windcode, field)
+        else:
+            df_end = download_indexconstituent(w, date, windcode, field)
+        write_constituent(fullpath, df_end)
 
     if two_sides:
         # 只处理两头，中间不管
@@ -71,11 +78,13 @@ def _binsearch_download_sectorconstituent(w, dates, path, file_ext, start, end, 
     # 存在后检查两个数据是否一样，一样就跳过
     # 不一样就折半
     mid = (start + end) // 2
-    _binsearch_download_sectorconstituent(w, dates, path, file_ext, start, mid, sector, windcode, field)
-    _binsearch_download_sectorconstituent(w, dates, path, file_ext, mid, end, sector, windcode, field)
+    _binsearch_download_constituent(w, dates, path, file_ext, start, mid, sector, windcode, field, two_sides,
+                                    is_indexconstituent)
+    _binsearch_download_constituent(w, dates, path, file_ext, mid, end, sector, windcode, field, two_sides,
+                                    is_indexconstituent)
 
 
-def file_download_sectorconstituent(w, dates, path, file_ext, sector, windcode, field):
+def file_download_constituent(w, dates, path, file_ext, sector, windcode, field, is_indexconstituent):
     """
     输入目录和时间段，自动下载两边数据，同时补上中间数据，可能有重复，需要再清理
     :param w:
@@ -88,36 +97,40 @@ def file_download_sectorconstituent(w, dates, path, file_ext, sector, windcode, 
     :return:
     """
     # 先为两条加上两个文件，然后使用文件遍历的算法
-    _binsearch_download_sectorconstituent(w, dates, path, file_ext, 0, len(dates) - 1, sector,
-                                          windcode, field,
-                                          True)
+    _binsearch_download_constituent(w, dates, path, file_ext, 0, len(dates) - 1, sector,
+                                    windcode, field,
+                                    True, is_indexconstituent)
 
     last_filename = None
     last_set = None
     for dirpath, dirnames, filenames in os.walk(path):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
-            curr_df = read_sectorconstituent(filepath)
+            curr_df = read_constituent(filepath)
+            if curr_df is None:
+                continue
             curr_set = set(curr_df['wind_code'])
             if last_set is None:
                 last_set = curr_set
                 last_filename = filename
             else:
                 if last_set == curr_set:
+                    print(filepath)
                     pass
                 else:
                     part_dates = dates[last_filename[:-4]:filename[:-4]]
                     # 把前后两个数据之间的全下载过来，以后再考虑别的问题
-                    _binsearch_download_sectorconstituent(w, part_dates, path, file_ext, 0, len(part_dates) - 1, sector,
-                                                          windcode, field)
+                    _binsearch_download_constituent(w, part_dates, path, file_ext, 0, len(part_dates) - 1, sector,
+                                                    windcode, field, False, is_indexconstituent)
                 last_set = curr_set
                 last_filename = filename
 
 
-def remove_sectorconstituent(path):
+def move_constituent(path, dst_path):
     """
     移除多余的数据，三个一组，重复的就删除中间那个
     保留了两侧，这样在下载数据时可以检查，发现一样就不操作了
+    三个一组，第4个和第5个的重复无法检测
     :return:
     """
     df_list = []
@@ -125,32 +138,44 @@ def remove_sectorconstituent(path):
     for dirpath, dirnames, filenames in os.walk(path):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
-            curr_df = read_sectorconstituent(filepath)
+            curr_df = read_constituent(filepath)
             path_list.append(filepath)
             df_list.append(set(curr_df['wind_code']))
 
     # 分三个一组
+    k = 0
     while True:
-        print('=======开始一轮======')
-        path_list_3 = [path_list[i:i + 3] for i in range(0, len(path_list), 3)]
-        df_list_3 = [df_list[i:i + 3] for i in range(0, len(df_list), 3)]
+        print('=======开始一轮======', k)
+
+        path_list_first = path_list[0:k % 3]
+        df_list_first = df_list[0:k % 3]
+        # 有可能出现第三个与第四个一样，但无法排除的问题，所以用k来移动一下
+        path_list_3 = [path_list[i:i + 3] for i in range(k % 3, len(path_list), 3)]
+        df_list_3 = [df_list[i:i + 3] for i in range(k % 3, len(df_list), 3)]
         path_list = []
         df_list = []
+        # 移动时会出现前部分没有在循环中，被抛弃，所以要主动添加进来
+        path_list.extend(path_list_first)
+        df_list.extend(df_list_first)
         IsRemove = False
         for i, j in enumerate(df_list_3):
             if len(j) == 3:
                 if j[0] == j[2]:
-                    print("删除中间:%s" % path_list_3[i][1])
-                    os.remove(path_list_3[i][1])
+                    print("移除中间:%s" % path_list_3[i][1])
+                    src_file = os.path.split(path_list_3[i][1])
+                    dst_file = os.path.join(dst_path, src_file[1])
+                    if os.path.exists(dst_file):
+                        os.remove(dst_file)
+                    shutil.move(path_list_3[i][1], dst_path)
                     path_list.append(path_list_3[i][0])
                     path_list.append(path_list_3[i][2])
                     df_list.append(df_list_3[i][0])
                     df_list.append(df_list_3[i][2])
                     IsRemove = True
                 else:
-                    print("保留中间:%s" % path_list_3[i][1])
-                    print("戴帽:%s" % ((j[0] | j[2]) - j[0]))
-                    print("摘帽:%s" % ((j[0] | j[2]) - j[2]))
+                    # print("保留中间:%s" % path_list_3[i][1])
+                    # print("戴帽:%s" % ((j[0] | j[2]) - j[0]))
+                    # print("摘帽:%s" % ((j[0] | j[2]) - j[2]))
                     path_list.extend(path_list_3[i])
                     df_list.extend(df_list_3[i])
             else:
@@ -158,10 +183,12 @@ def remove_sectorconstituent(path):
                 df_list.extend(df_list_3[i])
 
         if not IsRemove:
-            print('Done')
-            break
-
-    print(path_list)
+            print('此轮没有要移动的文件，查下一次')
+            k += 1
+            if k > 5:
+                # 第三轮其实已经处理得差不多了
+                break
+                # print(path_list)
 
 
 def download_sectors_list(
@@ -217,10 +244,10 @@ def download_sectors(
 
         df = trading_days
         df['date_str'] = trading_days['date'].astype(str)
-        file_download_sectorconstituent(w, df['date_str'], foldpath, '.csv',
-                                        sector=None, windcode=wind_code, field='wind_code')
+        file_download_constituent(w, df['date_str'], foldpath, '.csv',
+                                  sector=None, windcode=wind_code, field='wind_code', is_indexconstituent=False)
         # 移除多余的数据文件
-        remove_sectorconstituent(foldpath)
+        move_constituent(foldpath)
 
 
 def download_sector(
@@ -240,6 +267,28 @@ def download_sector(
     df['date_str'] = trading_days['date'].astype(str)
 
     foldpath = os.path.join(root_path, sector_name)
-    file_download_sectorconstituent(w, df['date_str'], foldpath, '.csv',
-                                    sector=sector_name, windcode=None, field='wind_code')
-    remove_sectorconstituent(foldpath)
+    file_download_constituent(w, df['date_str'], foldpath, '.csv',
+                              sector=sector_name, windcode=None, field='wind_code', is_indexconstituent=False)
+    move_constituent(foldpath)
+
+
+def download_index_weight(w, trading_days, wind_code, root_path):
+    df = trading_days
+    df['date_str'] = trading_days['date'].astype(str)
+
+    foldpath = os.path.join(root_path, wind_code)
+    file_download_constituent(w, df['date_str'], foldpath, '.csv',
+                              sector=None, windcode=wind_code, field='wind_code,i_weight', is_indexconstituent=True)
+
+    dst_path = os.path.join(root_path, "%s_move" % wind_code)
+    move_constituent(foldpath, dst_path)
+
+
+def download_index_weight2(w, dates, wind_code, root_path):
+    for date in dates:
+        path = os.path.join(root_path, wind_code, date.strftime('%Y-%m-%d.csv'))
+        df = read_constituent(path)
+        if df is None:
+            print("下载权重", path)
+            df = download_indexconstituent(w, date.strftime('%Y-%m-%d'), wind_code)
+            write_constituent(path, df)
