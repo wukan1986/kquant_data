@@ -1,2 +1,3 @@
 # 请设置正确kquant_data所在的文件夹
+# 如果出现site.py报错，请将这两行中文都删除即可
 d:\Users\Kan\Documents\GitHub\kquant_data

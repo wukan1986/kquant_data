@@ -12,7 +12,8 @@ import shutil
 import pandas as pd
 from datetime import datetime
 
-from ..wind.wset import write_constituent, read_constituent, download_sectorconstituent, download_indexconstituent
+from ..wind.wset import write_constituent, read_constituent, download_sectorconstituent, download_indexconstituent, \
+    download_futureoir
 
 
 def _binsearch_download_constituent(w, dates, path, file_ext, start, end, sector, windcode, field,
@@ -273,6 +274,14 @@ def download_sector(
 
 
 def download_index_weight(w, trading_days, wind_code, root_path):
+    """
+    下载指数成份和权重
+    :param w:
+    :param trading_days:
+    :param wind_code:
+    :param root_path:
+    :return:
+    """
     df = trading_days
     df['date_str'] = trading_days['date'].astype(str)
 
@@ -292,3 +301,70 @@ def download_index_weight2(w, dates, wind_code, root_path):
             print("下载权重", path)
             df = download_indexconstituent(w, date.strftime('%Y-%m-%d'), wind_code)
             write_constituent(path, df)
+
+
+def download_futureoir_day_range(w, day_range, windcode, root_path):
+    """
+    指定
+    :param w:
+    :param day_range:
+    :param windcode:
+    :param root_path:
+    :return:
+    """
+    startdate = day_range[0]
+    enddate = day_range[-1]
+    print("长度%d,开始%s,结束%s" % (len(day_range), startdate, enddate))
+    if len(day_range) > 0:
+        df = download_futureoir(w, startdate=startdate, enddate=enddate, windcode=windcode)
+        if df.empty:
+            return 0
+        dfg = df.groupby(by=['date'])
+        for name, group in dfg:
+            try:
+                # 如果数据超出，这里会报错
+                path = os.path.join(root_path, windcode, name.strftime('%Y-%m-%d.csv'))
+                # 索引不要保存
+                group.to_csv(path, encoding='utf-8-sig', date_format='%Y-%m-%d', index=False)
+            except:
+                print('下载出错，可能需要重新运行一次')
+        return len(day_range)
+    return 0
+
+
+def resume_download_futureoir(w, trading_days, root_path, windcode, adjust_trading_days):
+    dir_path = os.path.join(root_path, windcode)
+    os.makedirs(dir_path, exist_ok=True)
+
+    # 从第一个有数据的部分开始第一条,这个需要根据自己的情况进行处理
+    if adjust_trading_days:
+        for dirpath, dirnames, filenames in os.walk(dir_path):
+            for filename in filenames:
+                trading_days = trading_days[filename[:10]:]
+                break
+
+    # 分成list套list，只要时间超长就分新的一组
+    last_date = pd.Timestamp(1900, 1, 1)
+    day_ranges = []
+    day_range = []
+    for day in trading_days['date']:
+        path = os.path.join(root_path, windcode, day.strftime('%Y-%m-%d.csv'))
+        if os.path.exists(path):
+            continue
+        else:
+            if (day - last_date).days > 20 or len(day_range) >= 30:
+                day_ranges.append(day_range)
+                day_range = []
+            last_date = day
+            day_range.append(day)
+    # 将最后一个添加进去
+    day_ranges.append(day_range)
+
+    for day_range in day_ranges:
+        if len(day_range) > 0:
+            ret = download_futureoir_day_range(w, day_range, windcode, root_path)
+            if ret == 0:
+                print("下载数据为空，后面不再处理")
+                break
+
+    print('处理完毕！可能有部分数据由于超时没有下载成功，可再运行一次脚本')

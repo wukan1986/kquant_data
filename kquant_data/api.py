@@ -108,6 +108,7 @@ def all_instruments(path=None, type=None):
     return df
 
 
-def get_datetime(path, index_col='index_datetime'):
-    dt = pd.read_csv(path, index_col=index_col, parse_dates=True)
+def get_datetime(path):
+    dt = pd.read_csv(path, index_col=0, parse_dates=True)
+    dt['date'] = dt.index
     return dt

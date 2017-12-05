@@ -36,7 +36,7 @@
 - demo_stock: 股票数据下载转换示例（需要按情况修改）
 - api.py: `get_price`函数所在文件
 - config.py: 各种配置信息（需要按情况修改）
-- kquant_data.pth: 库路径文件（需要按情况修改后，复制到Anaconda3\Lib\site-packages\下）
+- kquant_data.pth: 库路径文件（需要按情况修改后，复制到Anaconda3\Lib\site-packages\下），如果出现site.py编码问题，请将.pth中的中文注释删除
 - DATA_STK.zip: 测试用数据目录。最新行情通过前面的脚本生成，由于数据量大，万得因子数据可从群、网盘下载最新数据覆盖，其它时间自己更新即可。
 
 ## 安装
@@ -44,6 +44,7 @@
 2. pandas.read_csv在中文路径下可能有问题，目前测试Python 64位下有问题，32位下正常。可以两版都装。板块、ST这类的信息文件名中会出现中文
 3. 目前没有提供pip安装方式，可以将项目放到合适地方后，在Anaconda3\Lib\site-packages\中添加kquant_data.pth文件
 4. 安装通达信股票软件，每天收盘后下载数据。可配置成自动化
+5. 通达信最新版不能在虚拟机中运行，有部署到云服务器需求的用户可以考虑安装2017年6月份以前的版本
 
 ## 全自动下载转换
 1. 安装AutoIt3

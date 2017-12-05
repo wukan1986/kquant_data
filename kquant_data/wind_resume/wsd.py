@@ -26,7 +26,8 @@ def resume_download_daily_many_to_one_file(
         dtype,
         enddate,
         root_path,
-        option='unit=1;rptType=1;Period=Q;Days=Alldays'):
+        option='unit=1;rptType=1;Period=Q;Days=Alldays',
+        default_start_date='2000-01-01'):
     """
     增量下载，下载每个季度因子到一个文件，由于季度使用日历日
     按日下数据也没有关系，一般是每天都不一样才使用，这时使用交易日
@@ -63,7 +64,7 @@ def resume_download_daily_many_to_one_file(
         df_old = df_old[:back]
     except:
         # 打开失败，使用老数据
-        new_start_str = '2000-01-01'
+        new_start_str = default_start_date
 
     df_new = download_daily_between(w, wind_codes, field,
                                     new_start_str, new_end_str, option)
@@ -223,7 +224,9 @@ def resume_download_financial_report_data_daily_latest(
         wind_codes,
         trading_days,
         root_path,
-        field='total_shares'):
+        field='total_shares',
+        date_str=datetime.today().strftime('%Y-%m-%d'),
+        option=""):
     """
     下载全市场最新一天的数据，然后与历史的合并
     合并后的数据中间有部分需要补充，交给另一个过程来补
@@ -233,8 +236,8 @@ def resume_download_financial_report_data_daily_latest(
     :return:
     """
     # 下载最新一天的数据
-    date_str = datetime.today().strftime('%Y-%m-%d')
-    df_new = download_daily_at(w, wind_codes, field, date_str, "")
+    # date_str = datetime.today().strftime('%Y-%m-%d')
+    df_new = download_daily_at(w, wind_codes, field, date_str, option)
     path = os.path.join(root_path, 'temp', '%s.csv' % field)
     write_data_dataframe(path, df_new)
 

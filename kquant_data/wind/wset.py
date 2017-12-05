@@ -191,3 +191,32 @@ def download_seoimplementation(w, startdate, enddate):
     df['unlocking_time'] = pd.to_datetime(df['unlocking_time'])
 
     return df
+
+
+def download_futureoir(w, startdate, enddate, windcode):
+    """
+    品种持仓
+    是将多仓与空仓排名合并到一起，然后按多仓进行统一排名，所以对于空仓要使用时，需要自行重新排名
+    查询的跨度不要太长，一个月或三个月
+    :param w:
+    :param startdate:
+    :param enddate:
+    :return:
+    """
+    w.asDateTime = asDateTime
+    w_wset_data = w.wset("futureoir",
+                         "startdate=%s;enddate=%s;varity=%s;order_by=long;ranks=all;"
+                         "field=date,ranks,member_name,"
+                         "long_position,long_position_increase,long_potion_rate,"
+                         "short_position,short_position_increase,short_position_rate,"
+                         "vol,vol_increase,vol_rate,settle" % (startdate, enddate, windcode))
+    df = pd.DataFrame(w_wset_data.Data)
+    df = df.T
+    df.columns = w_wset_data.Fields
+
+    try:
+        df['date'] = pd.to_datetime(df['date'])
+    except:
+        pass
+
+    return df

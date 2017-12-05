@@ -10,12 +10,16 @@
 """
 import os
 
+"""
+股票
+"""
 # 通达信目录
 __CONFIG_TDX_STK_DIR__ = r'D:\new_hbzq'
 # 大智慧权息文件
 __CONFIG_DZH_PWR_FILE__ = r"D:\dzh2\Download\PWR\full.PWR"
 # 输出的股票行情目录
 __CONFIG_H5_STK_DIR__ = r'D:\DATA_STK'
+
 
 # 股票的除权除息数据
 __CONFIG_H5_STK_DIVIDEND_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'dividend')
@@ -28,8 +32,17 @@ __CONFIG_H5_STK_FACTOR_DIR__ = os.path.join(__CONFIG_H5_STK_DIR__, 'factor')
 # 交易日数据，请每年末更新一下第二年的交易日信息
 __CONFIG_TDAYS_SSE_FILE__ = os.path.join(__CONFIG_H5_STK_DIR__, 'tdays', 'SSE.csv')
 
+"""
+期货
+"""
 # 期货行情数据
-__CONFIG_H5_FUT_DIR__ = r'D:\DATA_FUT_HDF5\Data_Processed'
+__CONFIG_H5_FUT_DIR__ = r'D:\DATA_FUT'
+
+__CONFIG_H5_FUT_FACTOR_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'factor')
+
+
+
+
 
 # 为了将自定义库引入进来，注意这里要改
 # sys.path.append(r'D:\Python\Kan')
