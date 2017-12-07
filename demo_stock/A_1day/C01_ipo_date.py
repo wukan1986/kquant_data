@@ -20,7 +20,7 @@ if __name__ == '__main__':
     wind_codes = Symbols['wind_code']
 
     # 增量下载ipo_date，由于每周都有上市，但因为新上市股票不参加交易，所以看情况进行
-    if False:
+    if True:
         resume_download_delist_date(w, wind_codes, __CONFIG_H5_STK_FACTOR_DIR__,
                                     field='ipo_date',
                                     dtype=np.datetime64)

@@ -15,9 +15,12 @@ CFFEX   CFE
 '''
 import os
 import pandas as pd
+import re
+
+CZCE_pattern = re.compile(r'(\D{1,2})(\d{0,1})(\d{3})(.*)')
 
 CFE = ['IF', 'IC', 'IH', 'T', 'TF', 'AF', 'EF', 'TS', 'TT']
-SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', 'bu', 'ru'] # , 'im'这个只是指数
+SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', 'bu', 'ru']  # , 'im'这个只是指数
 CZC = ['SR', 'CF', 'ZC', 'FG', 'TA', 'WH', 'PM', 'RI', 'LR', 'JR', 'RS', 'OI', 'RM', 'SF', 'SM', 'MA', 'WT', 'WS', 'RO',
        'ER', 'ME', 'TC', 'CY']
 DCE = ['m', 'y', 'a', 'b', 'p', 'c', 'cs', 'jd', 'fb', 'bb', 'l', 'v', 'pp', 'j', 'jm', 'i']
@@ -52,6 +55,7 @@ def get_wind_code(product):
     if product in DCE:
         return product + '.DCE'
 
+
 def get_wind_code_S(product):
     if product in CFE:
         return product + '_S.CFE'
@@ -68,6 +72,7 @@ def get_all_products_wind():
     __lst = [get_wind_code(x).upper() for x in _lst]
     return __lst
 
+
 def get_all_products_wind_S():
     _lst = get_all_products()
     __lst = [get_wind_code_S(x).upper() for x in _lst]
@@ -80,7 +85,20 @@ def get_actvie_products_wind():
     return __lst
 
 
+def CZCE_3to4(symbol3, y3=1):
+    match = CZCE_pattern.match(symbol3)
+    # 有就直接用，没有就得填，到2000年怎么办，到2020年怎么办
+    if not match:
+        return symbol3
+    num1 = match.group(2)
+    if len(num1) > 0:
+        return symbol3
+
+    return "%s%d%s%s" % (match.group(1), y3, match.group(3), match.group(4))
+
+
 if __name__ == '__main__':
     x = get_actvie_products_wind()
     print(x)
-    print(1)
+    print(CZCE_3to4('RB807'))
+    print(CZCE_3to4('RB807.CZC'))

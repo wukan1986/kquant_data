@@ -77,7 +77,7 @@ def read_constituent(path):
     """
     try:
         df = pd.read_csv(path, encoding='utf-8-sig', parse_dates=True)
-    except:
+    except Exception as e:
         return None
     try:
         df['date'] = pd.to_datetime(df['date'])

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-调用wset函数的部分
+调用wss函数的部分
 """
 from WindPy import w
 import os
@@ -9,6 +9,7 @@ import pandas as pd
 from .utils import asDateTime
 
 from ..utils.xdatetime import datetime_2_yyyy
+from ..utils.xdatetime import datetime_2_yyyyMMdd
 
 
 def download_fellow_listeddate(w, wind_codes, year):
@@ -26,6 +27,29 @@ def download_fellow_listeddate(w, wind_codes, year):
     df = df.T
     df.columns = ['fellow_listeddate']
     df.index = w_wss_data.Codes
+    return df
+
+
+def download_ipo_last_trade_trading(w, wind_codes):
+    # 黄金从20130625开始将最小变动价位从0.01调整成了0.05，但从万得上查出来还是完全一样，所以没有必要记录mfprice
+    # 郑商所在修改合约交易单位时都改了合约代码，所以没有必要记录contractmultiplier
+    w.asDateTime = asDateTime
+    # w_wss_data = w.wss(wind_codes, "sec_name,ipo_date,lasttrade_date,lasttradingdate,contractmultiplier,mfprice", "")
+    w_wss_data = w.wss(wind_codes, "sec_name,ipo_date,lasttrade_date,lasttradingdate", "")
+    df = pd.DataFrame(w_wss_data.Data)
+    df = df.T
+    # df.columns = ['sec_name', 'ipo_date', 'lasttrade_date', 'lasttradingdate', 'contractmultiplier', 'mfprice']
+    df.columns = ['sec_name', 'ipo_date', 'lasttrade_date', 'lasttradingdate']
+    df.index = w_wss_data.Codes
+    df.index.name = 'wind_code'
+
+    df['ipo_date'] = df['ipo_date'].apply(datetime_2_yyyyMMdd)
+    df['lasttrade_date'] = df['lasttrade_date'].apply(datetime_2_yyyyMMdd)
+    df['lasttradingdate'] = df['lasttradingdate'].apply(datetime_2_yyyyMMdd)
+    # df['contractmultiplier'] = df['contractmultiplier'].astype(int)
+
+    df.replace(18991230, 0, inplace=True)
+
     return df
 
 

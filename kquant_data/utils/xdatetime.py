@@ -58,6 +58,15 @@ def datetime_2_yyyyMMdd____(dt):
     t = dt.timetuple()
     return float((t.tm_year * 10000.0 + t.tm_mon * 100 + t.tm_mday) * 10000.0)
 
+def datetime_2_yyyyMMdd(dt):
+    """
+    将时间转换成float类型
+    :param dt:
+    :return:
+    """
+    t = dt.timetuple()
+    return int((t.tm_year * 10000.0 + t.tm_mon * 100 + t.tm_mday))
+
 
 def datetime_2_MM(dt):
     """

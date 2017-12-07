@@ -248,7 +248,10 @@ def download_sectors(
         file_download_constituent(w, df['date_str'], foldpath, '.csv',
                                   sector=None, windcode=wind_code, field='wind_code', is_indexconstituent=False)
         # 移除多余的数据文件
-        move_constituent(foldpath)
+        dst_path = os.path.join(root_path, "%s_move" % sector_name, sec_name)
+        if not os.path.exists(dst_path):
+            os.makedirs(dst_path)
+        move_constituent(foldpath, dst_path)
 
 
 def download_sector(
@@ -270,7 +273,11 @@ def download_sector(
     foldpath = os.path.join(root_path, sector_name)
     file_download_constituent(w, df['date_str'], foldpath, '.csv',
                               sector=sector_name, windcode=None, field='wind_code', is_indexconstituent=False)
-    move_constituent(foldpath)
+
+    dst_path = os.path.join(root_path, "%s_move" % sector_name)
+    if not os.path.exists(dst_path):
+        os.makedirs(dst_path)
+    move_constituent(foldpath, dst_path)
 
 
 def download_index_weight(w, trading_days, wind_code, root_path):

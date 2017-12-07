@@ -42,4 +42,4 @@ if __name__ == '__main__':
     # 补数据
     resume_download_daily_to_many_files(w, trading_days, contract_issuedate, __CONFIG_H5_FUT_FACTOR_DIR__, field)
 
-    # 上次的合约更名后，这一次再补数时，会认为是不同的合约，过于麻烦，所以郑商所改名还是由C#程序来实现得了
+    # 上次的合约更名后，这一次再补数时，会认为是不同的合约，过于麻烦，所以郑商所3位变4位还是由C#程序来实现得了

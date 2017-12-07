@@ -22,7 +22,7 @@ if __name__ == '__main__':
                               root_path=__CONFIG_H5_STK_SECTOR_DIR__)
 
     # 下载交易日，在每年的最后几周下即即可，需手工修改
-    if False:
+    if True:
         resume_download_tdays(w,
-                              enddate='2017-12-31',
+                              enddate='2018-12-28',
                               path=__CONFIG_TDAYS_SSE_FILE__)

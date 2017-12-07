@@ -28,11 +28,6 @@ if __name__ == '__main__':
     # trading_days = trading_days['2016-01-01':date_str]
     trading_days = trading_days['2012-06-01':'2014-12-31']
 
-    # 读取品种列表
-    # df = pd.read_csv(r'D:\DATA_FUT\trade_code.csv')
-    # df['wind_code'] = df['product'] + '.' + df['exchange']
-    # df['wind_code'] = df['wind_code'].str.upper()
-
     # 下载后存下
     windcodes = get_actvie_products_wind()
     root_path = r'D:\DATA_FUT\futureoir'

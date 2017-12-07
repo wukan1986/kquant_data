@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 得到合约的上市时间
+有新品种上市时才运行
 """
 import os
 import numpy as np
@@ -18,7 +19,7 @@ if __name__ == '__main__':
     wind_codes_s = get_all_products_wind_S()
     wind_codes.extend(wind_codes_s)
 
-    # 增量下载ipo_date，由于每周都有上市，但因为新上市股票不参加交易，所以看情况进行
+    #
     if True:
         resume_download_delist_date(w, wind_codes, __CONFIG_H5_FUT_FACTOR_DIR__,
                                     field='contract_issuedate',

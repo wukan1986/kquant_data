@@ -39,6 +39,8 @@ __CONFIG_TDAYS_SSE_FILE__ = os.path.join(__CONFIG_H5_STK_DIR__, 'tdays', 'SSE.cs
 __CONFIG_H5_FUT_DIR__ = r'D:\DATA_FUT'
 
 __CONFIG_H5_FUT_FACTOR_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'factor')
+# 股票行业信息
+__CONFIG_H5_FUT_SECTOR_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'sectorconstituent')
 
 
 
