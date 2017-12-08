@@ -5,23 +5,58 @@
 """
 from WindPy import w
 from datetime import datetime
-from kquant_data.wind.tdays import read_tdays
+import os
+import pandas as pd
 from kquant_data.wind.wss import download_ipo_last_trade_trading
-from kquant_data.xio.csv import write_data_dataframe
+from kquant_data.xio.csv import write_data_dataframe, read_data_dataframe
 from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__, __CONFIG_TDAYS_SSE_FILE__
+from kquant_data.wind.wset import read_constituent
 
-if __name__ == '__main__':
-    w.start()
 
-    date_str = datetime.today().strftime('%Y-%m-%d')
+def process_dir2file(w, mydir, myfile):
+    df = read_data_dataframe(myfile)
+    all_set = set(df.index)
+    for dirpath, dirnames, filenames in os.walk(mydir):
+        for filename in filenames:
+            # 这个日期需要记得修改
+            if filename < "2017-01-01.csv":
+                continue
 
-    trading_days = read_tdays(__CONFIG_TDAYS_SSE_FILE__)
-    trading_days = trading_days['2017-12-01':date_str]
+            filepath = os.path.join(dirpath, filename)
 
-    df = download_ipo_last_trade_trading(w, "IF1801.CFE,10000001.SH,I1801.DCE")
+            df1 = read_constituent(filepath)
+            curr_set = set(df1['wind_code'])
+            diff_set = curr_set - all_set
+            if len(diff_set) == 0:
+                continue
+
+            print(filepath)
+            df2 = download_ipo_last_trade_trading(w, list(diff_set))
+            df = pd.concat([df, df2])
+            all_set = set(df.index)
+            # 出于安全考虑，还是每次都保存
+            write_data_dataframe(myfile, df)
 
     df['wind_code'] = df.index
     df.sort_values(by=['ipo_date', 'wind_code'], inplace=True)
     del df['wind_code']
+    write_data_dataframe(myfile, df)
 
-    write_data_dataframe(r'd:\9.csv', df)
+
+if __name__ == '__main__':
+    w.start()
+
+    # 先读取数据，合并，找不同，然后下单
+    outputFile = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, 'ipo_last_trade_trading.csv')
+
+    path = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '郑商所全部品种')
+    process_dir2file(w, path, outputFile)
+
+    path = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '中金所全部品种')
+    process_dir2file(w, path, outputFile)
+
+    path = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '上期所全部品种')
+    process_dir2file(w, path, outputFile)
+
+    path = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '大商所全部品种')
+    process_dir2file(w, path, outputFile)

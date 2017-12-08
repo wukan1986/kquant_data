@@ -34,11 +34,13 @@ def download_ipo_last_trade_trading(w, wind_codes):
     # 黄金从20130625开始将最小变动价位从0.01调整成了0.05，但从万得上查出来还是完全一样，所以没有必要记录mfprice
     # 郑商所在修改合约交易单位时都改了合约代码，所以没有必要记录contractmultiplier
     w.asDateTime = asDateTime
-    # w_wss_data = w.wss(wind_codes, "sec_name,ipo_date,lasttrade_date,lasttradingdate,contractmultiplier,mfprice", "")
     w_wss_data = w.wss(wind_codes, "sec_name,ipo_date,lasttrade_date,lasttradingdate", "")
-    df = pd.DataFrame(w_wss_data.Data)
-    df = df.T
-    # df.columns = ['sec_name', 'ipo_date', 'lasttrade_date', 'lasttradingdate', 'contractmultiplier', 'mfprice']
+    grid = w_wss_data.Data
+
+    # T1803一类的会被当成时间，需要提前转置
+    new_grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+
+    df = pd.DataFrame(new_grid)
     df.columns = ['sec_name', 'ipo_date', 'lasttrade_date', 'lasttradingdate']
     df.index = w_wss_data.Codes
     df.index.name = 'wind_code'
@@ -46,7 +48,6 @@ def download_ipo_last_trade_trading(w, wind_codes):
     df['ipo_date'] = df['ipo_date'].apply(datetime_2_yyyyMMdd)
     df['lasttrade_date'] = df['lasttrade_date'].apply(datetime_2_yyyyMMdd)
     df['lasttradingdate'] = df['lasttradingdate'].apply(datetime_2_yyyyMMdd)
-    # df['contractmultiplier'] = df['contractmultiplier'].astype(int)
 
     df.replace(18991230, 0, inplace=True)
 

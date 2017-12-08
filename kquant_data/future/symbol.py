@@ -97,6 +97,31 @@ def CZCE_3to4(symbol3, y3=1):
     return "%s%d%s%s" % (match.group(1), y3, match.group(3), match.group(4))
 
 
+def CZCE_4to3(symbol4):
+    match = CZCE_pattern.match(symbol4)
+    # 有就直接用，没有就得填，到2000年怎么办，到2020年怎么办
+    if not match:
+        return symbol4
+
+    return "%s%s%s" % (match.group(1), match.group(3), match.group(4))
+
+
+def CZCE_convert(symbol):
+    match = CZCE_pattern.match(symbol)
+    # 有就直接用，没有就得填，到2000年怎么办，到2020年怎么办
+    if not match:
+        return symbol
+
+    num1 = match.group(2)
+    num3 = match.group(3)
+    # 这里老要改
+    if num3 > '606' and num1 == '1':
+        return "%s%s%s" % (match.group(1), match.group(3), match.group(4))
+    if len(num1) == 0 and num3 <= '606':
+        return "%s1%s%s" % (match.group(1), match.group(3), match.group(4))
+    return symbol
+
+
 if __name__ == '__main__':
     x = get_actvie_products_wind()
     print(x)
