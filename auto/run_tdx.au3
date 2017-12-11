@@ -7,7 +7,7 @@ Func RunMain()
    ; 请配置通达信软件的主程序
    Local $iPID = Run("D:\new_hbzq\TdxW.exe", "")
    ; 请配置通达信软件的标题
-   Local $title = "[TITLE:华宝证券至富版V7.65; CLASS:#32770]"
+   Local $title = "[TITLE:华宝证券至富版V7.61; CLASS:#32770]"
    WinActivate($title)
    Local $hLoginWnd = WinWaitActive($title)
 

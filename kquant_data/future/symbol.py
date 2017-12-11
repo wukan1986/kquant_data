@@ -22,7 +22,7 @@ CZCE_pattern = re.compile(r'(\D{1,2})(\d{0,1})(\d{3})(.*)')
 CFE = ['IF', 'IC', 'IH', 'T', 'TF', 'AF', 'EF', 'TS', 'TT']
 SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', 'bu', 'ru']  # , 'im'这个只是指数
 CZC = ['SR', 'CF', 'ZC', 'FG', 'TA', 'WH', 'PM', 'RI', 'LR', 'JR', 'RS', 'OI', 'RM', 'SF', 'SM', 'MA', 'WT', 'WS', 'RO',
-       'ER', 'ME', 'TC', 'CY']
+       'ER', 'ME', 'TC', 'CY', 'AP']
 DCE = ['m', 'y', 'a', 'b', 'p', 'c', 'cs', 'jd', 'fb', 'bb', 'l', 'v', 'pp', 'j', 'jm', 'i']
 
 # 不活跃的合约

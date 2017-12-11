@@ -42,6 +42,10 @@ __CONFIG_H5_FUT_FACTOR_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'factor')
 
 __CONFIG_H5_FUT_SECTOR_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'sectorconstituent')
 
+__CONFIG_H5_FUT_DATA_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'data')
+
+__CONFIG_TDAYS_SHFE_FILE__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'tdays', 'SHFE.csv')
+
 
 
 

@@ -9,13 +9,13 @@ import os
 import pandas as pd
 from kquant_data.future.symbol import CZCE_convert
 from kquant_data.wind_resume.wset import read_constituent, write_constituent
+from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__
 
 
-def process_CZCE_type2():
+def process_CZCE_type2(path):
     # 郑商所的合约，对于已经退市的合约需要将3位变成4位
     # 1. 最后一个文件肯定是最新的，它是当前正在交易的合约，应当全是3位，然后遍历其它文件没有出现的就可以改名
     # 2. 实际测试后发现，退市的合约并不是立即换成4位，需要等一年多，或更长时间
-    path = r'D:\DATA_FUT\sectorconstituent\郑商所全部品种'
     for dirpath, dirnames, filenames in os.walk(path, topdown=False):
         for filename in filenames:
             if filename < '2015-01-01.csv':
@@ -36,4 +36,5 @@ def process_CZCE_type2():
 
 
 if __name__ == '__main__':
+    path = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '郑商所全部品种')
     process_CZCE_type2()

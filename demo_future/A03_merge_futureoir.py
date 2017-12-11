@@ -5,6 +5,7 @@
 """
 import os
 import pandas as pd
+from kquant_data.config import __CONFIG_H5_FUT_DATA_DIR__
 
 
 def process1(input_path, output_path, member_name, folder_name):
@@ -63,12 +64,13 @@ def process2(input_path, output_path):
 
 
 if __name__ == '__main__':
-    input_path = r'D:\DATA_FUT\futureoir'
-    output_path = r'D:\DATA_FUT\futureoir_processed'
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+
     member_name = '前二十名合计'
     folder_name = 'top20'
     process1(input_path, output_path, member_name, folder_name)
 
-    input_path = r'D:\DATA_FUT\futureoir_processed\top20'
-    output_path = r'D:\DATA_FUT\futureoir_processed'
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed", "top20")
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
     process2(input_path, output_path)

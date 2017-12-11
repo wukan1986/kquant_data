@@ -140,6 +140,8 @@ def move_constituent(path, dst_path):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             curr_df = read_constituent(filepath)
+            # if curr_df is None:
+            #    continue
             path_list.append(filepath)
             df_list.append(set(curr_df['wind_code']))
 

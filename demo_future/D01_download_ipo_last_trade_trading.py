@@ -4,12 +4,11 @@
 下载合约信息
 """
 from WindPy import w
-from datetime import datetime
 import os
 import pandas as pd
 from kquant_data.wind.wss import download_ipo_last_trade_trading
 from kquant_data.xio.csv import write_data_dataframe, read_data_dataframe
-from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__, __CONFIG_TDAYS_SSE_FILE__
+from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__
 from kquant_data.wind.wset import read_constituent
 
 
@@ -25,6 +24,7 @@ def process_dir2file(w, mydir, myfile):
             filepath = os.path.join(dirpath, filename)
 
             df1 = read_constituent(filepath)
+            # print(filepath)
             curr_set = set(df1['wind_code'])
             diff_set = curr_set - all_set
             if len(diff_set) == 0:

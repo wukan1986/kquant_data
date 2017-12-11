@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 下载主力和次主力交易代码
+C#部分会在使用时对郑商所补成4位再用，而csv文件中的3位可以先不动
 """
 from WindPy import w
 import os
@@ -12,12 +13,12 @@ from kquant_data.wind.tdays import read_tdays
 from kquant_data.wind_resume.wsd import resume_download_daily_to_many_files, \
     resume_download_financial_report_data_daily_latest
 
-from kquant_data.config import __CONFIG_H5_STK_FACTOR_DIR__, __CONFIG_H5_STK_DIR__, __CONFIG_TDAYS_SSE_FILE__
+from kquant_data.config import __CONFIG_TDAYS_SHFE_FILE__
 
 if __name__ == '__main__':
     w.start()
 
-    trading_days = read_tdays(__CONFIG_TDAYS_SSE_FILE__)
+    trading_days = read_tdays(__CONFIG_TDAYS_SHFE_FILE__)
 
     # 读取合约上市日期，提前做好准备
     path = os.path.join(__CONFIG_H5_FUT_FACTOR_DIR__, 'contract_issuedate.csv')
