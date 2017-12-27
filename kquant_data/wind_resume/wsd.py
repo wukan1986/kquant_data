@@ -120,6 +120,7 @@ def resume_download_daily_one_to_one_file(
         df_old = download_daily_from_beginning(w, ipo_date, date_str, symbol, field)
 
     series = download_daily_between_for_series(w, df_old.iloc[:, 0], symbol, field, trading_days)
+    series = series.dropna()
     # 对数据进行清理
     series = series_drop_duplicated_keep_both_rolling(series)
 

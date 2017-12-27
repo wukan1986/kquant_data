@@ -24,11 +24,12 @@ SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', '
 CZC = ['SR', 'CF', 'ZC', 'FG', 'TA', 'WH', 'PM', 'RI', 'LR', 'JR', 'RS', 'OI', 'RM', 'SF', 'SM', 'MA', 'WT', 'WS', 'RO',
        'ER', 'ME', 'TC', 'CY', 'AP']
 DCE = ['m', 'y', 'a', 'b', 'p', 'c', 'cs', 'jd', 'fb', 'bb', 'l', 'v', 'pp', 'j', 'jm', 'i']
+INE = ['sc']
 
 # 不活跃的合约
 InactiveProducts = ['b', 'fu', 'wr', 'JR', 'bb', 'LR', 'fb', 'RI', 'PM', 'RS', 'SF', 'SM']
 # 改名前的合约或过期的合约
-ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'TS', 'TT']  # 从AF开始的几个是没有上市的
+ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'TS', 'TT', 'im', 'sc']  # 从AF开始的几个是没有上市的
 # 有夜盘的
 NightProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC']
 
@@ -38,11 +39,11 @@ def is_inactvie_product(product):
 
 
 def get_all_products():
-    return list(set(CFE + SHF + CZC + DCE) - set(ExpiredProducts))
+    return list(set(CFE + SHF + CZC + DCE + INE) - set(ExpiredProducts))
 
 
 def get_actvie_products():
-    return list(set(CFE + SHF + CZC + DCE) - set(ExpiredProducts) - set(InactiveProducts))
+    return list(set(CFE + SHF + CZC + DCE + INE) - set(ExpiredProducts) - set(InactiveProducts))
 
 
 def get_wind_code(product):
@@ -54,6 +55,8 @@ def get_wind_code(product):
         return product + '.CZC'
     if product in DCE:
         return product + '.DCE'
+    if product in INE:
+        return product + '.INE'
 
 
 def get_wind_code_S(product):
@@ -65,6 +68,8 @@ def get_wind_code_S(product):
         return product + '_S.CZC'
     if product in DCE:
         return product + '_S.DCE'
+    if product in INE:
+        return product + '_S.INE'
 
 
 def get_all_products_wind():

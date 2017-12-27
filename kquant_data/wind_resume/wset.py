@@ -353,7 +353,7 @@ def resume_download_futureoir(w, trading_days, root_path, windcode, adjust_tradi
                 break
 
     # 分成list套list，只要时间超长就分新的一组
-    last_date = pd.Timestamp(1900, 1, 1)
+    last_date = pd.Timestamp(1900, 1, 1).tz_localize(None)
     day_ranges = []
     day_range = []
     for day in trading_days['date']:

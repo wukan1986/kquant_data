@@ -34,6 +34,8 @@ def process1(input_path, output_path, member_name, folder_name):
                     dfs = pd.concat([dfs, row])
 
             # dfs.set_index('date')
+            if dfs is None:
+                continue
             dfs.to_csv(path2, encoding='utf-8-sig', date_format='%Y-%m-%d')
             print("处理完成", path2)
 

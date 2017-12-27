@@ -11,7 +11,7 @@ import pandas as pd
 from kquant_data.wind.tdays import read_tdays
 from kquant_data.config import __CONFIG_TDAYS_SHFE_FILE__
 from kquant_data.wind_resume.wset import resume_download_futureoir
-from kquant_data.future.symbol import get_actvie_products_wind
+from kquant_data.future.symbol import get_actvie_products_wind,get_all_products_wind
 from kquant_data.config import __CONFIG_H5_FUT_DATA_DIR__
 
 if __name__ == '__main__':
@@ -27,12 +27,12 @@ if __name__ == '__main__':
 
     trading_days = read_tdays(__CONFIG_TDAYS_SHFE_FILE__)
     # trading_days = trading_days['2016-01-01':date_str]
-    trading_days = trading_days['2012-06-01':date_str]
+    trading_days = trading_days['2017-10-01':date_str]
 
     # 下载后存下
-    windcodes = get_actvie_products_wind()
+    windcodes = get_all_products_wind()
     root_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
 
     for windcode in windcodes:
         print('处理', windcode)
-        resume_download_futureoir(w, trading_days, root_path, windcode, adjust_trading_days=False)
+        resume_download_futureoir(w, trading_days, root_path, windcode, adjust_trading_days=True)
