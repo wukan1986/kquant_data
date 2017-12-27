@@ -373,7 +373,7 @@ def resume_download_futureoir(w, trading_days, root_path, windcode, adjust_tradi
         if len(day_range) > 0:
             ret = download_futureoir_day_range(w, day_range, windcode, root_path)
             if ret == 0:
-                print("下载数据为空，后面不再处理")
+                print("下载数据为空，有可能才上市没多久，需要再下载")
                 break
 
     print('处理完毕！可能有部分数据由于超时没有下载成功，可再运行一次脚本')

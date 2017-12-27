@@ -34,5 +34,6 @@ if __name__ == '__main__':
     root_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
 
     for windcode in windcodes:
+        # windcode = 'AP.CZC'
         print('处理', windcode)
         resume_download_futureoir(w, trading_days, root_path, windcode, adjust_trading_days=True)
