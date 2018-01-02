@@ -40,7 +40,7 @@ def process1(input_path, output_path, member_name, folder_name):
             print("处理完成", path2)
 
 
-def process2(input_path, output_path):
+def process2(input_path, output_path, folder_name):
     for dirpath, dirnames, filenames in os.walk(input_path):
         dfs_long = None
         dfs_short = None
@@ -58,21 +58,40 @@ def process2(input_path, output_path):
             col_short.name = col_name
             dfs_short = pd.concat([dfs_short, col_short], axis=1)
 
-        path2 = os.path.join(output_path, 'top20_long_position_increase.csv')
+        path2 = os.path.join(output_path, '%s_long_position_increase.csv' % folder_name)
         dfs_long.to_csv(path2, encoding='utf-8-sig', date_format='%Y-%m-%d')
 
-        path2 = os.path.join(output_path, 'top20_short_position_increase.csv')
+        path2 = os.path.join(output_path, '%s_short_position_increase.csv' % folder_name)
         dfs_short.to_csv(path2, encoding='utf-8-sig', date_format='%Y-%m-%d')
 
 
 if __name__ == '__main__':
-    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
-    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
 
     member_name = '前二十名合计'
     folder_name = 'top20'
-    process1(input_path, output_path, member_name, folder_name)
-
-    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed", "top20")
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
     output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
-    process2(input_path, output_path)
+    process1(input_path, output_path, member_name, folder_name)
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed", folder_name)
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+    process2(input_path, output_path, folder_name)
+
+
+    member_name = '前十名合计'
+    folder_name = 'top10'
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+    process1(input_path, output_path, member_name, folder_name)
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed", folder_name)
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+    process2(input_path, output_path, folder_name)
+
+
+    member_name = '前五名合计'
+    folder_name = 'top5'
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir")
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+    process1(input_path, output_path, member_name, folder_name)
+    input_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed", folder_name)
+    output_path = os.path.join(__CONFIG_H5_FUT_DATA_DIR__, "futureoir_processed")
+    process2(input_path, output_path, folder_name)
