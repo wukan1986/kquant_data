@@ -117,6 +117,7 @@ def download_daily_between_for_series(
 
     series_data = series
     run = False
+    set_data = set(series_data)
     # 这只能处理至少两个点的情况
     for i in range(0, len(series_data) - 1):
         if series_bool.iat[i]:
@@ -148,7 +149,9 @@ def download_daily_between_for_series(
 
             series_data = series_data.combine_first(s)
             # 标记一下进行过修改，还可以再测下一轮，否则不用
-            run = True
+            # 如果正好在换月的那天，A/B/nan出现时，会导致死循环下载
+            diff_data = set(series_data) - set_data
+            run = len(diff_data)>0
 
     if run:
         # 如果一轮都没有下载数据，就不能再进入到循环中了
