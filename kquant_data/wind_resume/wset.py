@@ -110,6 +110,8 @@ def file_download_constituent(w, dates, path, file_ext, sector, windcode, field,
             curr_df = read_constituent(filepath)
             if curr_df is None:
                 continue
+            if curr_df.empty:
+                continue
             curr_set = set(curr_df['wind_code'])
             if last_set is None:
                 last_set = curr_set
