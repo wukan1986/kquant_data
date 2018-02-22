@@ -147,11 +147,11 @@ def download_daily_between_for_series(
             s = df_new.iloc[:, 0]
             print(s)
 
-            series_data = series_data.combine_first(s)
+            series_data = series_data.combine(s, lambda x1, x2: x1 if pd.isnull(x2) else x2)
             # 标记一下进行过修改，还可以再测下一轮，否则不用
             # 如果正好在换月的那天，A/B/nan出现时，会导致死循环下载
             diff_data = set(series_data) - set_data
-            run = len(diff_data)>0
+            run = len(diff_data) > 0
 
     if run:
         # 如果一轮都没有下载数据，就不能再进入到循环中了

@@ -221,6 +221,13 @@ def resume_download_delist_date(
         write_data_dataframe(path, df)
 
 
+def combine_func(x1, x2):
+    # 优先使用新数据，因为万得可能更新了
+    if pd.isnull(x2):
+        return x1
+    return x2
+
+
 def resume_download_financial_report_data_daily_latest(
         w,
         wind_codes,
@@ -239,9 +246,10 @@ def resume_download_financial_report_data_daily_latest(
     """
     # 下载最新一天的数据
     # date_str = datetime.today().strftime('%Y-%m-%d')
-    df_new = download_daily_at(w, wind_codes, field, date_str, option)
     path = os.path.join(root_path, 'temp', '%s.csv' % field)
+    df_new = download_daily_at(w, wind_codes, field, date_str, option)
     write_data_dataframe(path, df_new)
+    df_new = read_data_dataframe(path)
 
     # 把数据合并过去，合并的同时下载数据，还是只合并？还是只合并吧，这样分步来也快
     for i in range(0, df_new.shape[1]):
@@ -252,9 +260,10 @@ def resume_download_financial_report_data_daily_latest(
         if df_old is None:
             # 如果还没有历史数据就跳过，让系统通过ipo_date文件再自动补充
             continue
-        # df_old = df_old[:-1]
+        # 有可能多次下载，后下载的数据更新了老数据，所以这里要进行处理，让新数据更新
         ss = df_old.iloc[:, 0]
-        series = ss.combine_first(s)
+        # series = ss.combine_first(s)
+        series = ss.combine(s, lambda x1, x2: x1 if pd.isnull(x2) else x2)
 
         # 对数据进行清理
         series = series_drop_duplicated_keep_both_rolling(series)
