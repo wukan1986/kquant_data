@@ -41,7 +41,7 @@
 
 ## 安装
 1. 只支持Python 3，因为在数据处理时为了加快进度，使用了多进程，Python 2版多进程时不支持参数
-2. pandas.read_csv在中文路径下可能有问题，目前测试Python 64位下有问题，32位下正常。可以两版都装。板块、ST这类的信息文件名中会出现中文
+2. Python 3.6将文件系统默认编码由mbcs改为了utf-8,导致read_csv在中文路径读取上会出错，示例中已经改好。参见PEP 529。板块、ST这类的信息文件名中会出现中文
 3. 目前没有提供pip安装方式，可以将项目放到合适地方后，在Anaconda3\Lib\site-packages\中添加kquant_data.pth文件
 4. 安装通达信股票软件，每天收盘后下载数据。可配置成自动化
 5. 通达信最新版不能在虚拟机中运行，有部署到云服务器需求的用户可以考虑安装2017年6月份以前的版本
@@ -50,8 +50,9 @@
 1. 安装AutoIt3
 2. 如在云服务器上使用，不要使用远程桌面，改用RealVNC，不然AutoIt的鼠标键盘模拟失效。
 3. 计划任务中添加15点45以后的任务，run_in_taskschd.bat为入口，入口bat不要有会阻塞任务的操作，如pause，否则下一次计划任务不会执行。
-4. 编辑auto/run_tdx.au3文件，配置通达信软件的目录和窗口标题，配错了无法自动下载数据
-5. run_after_market_close.bat/run_for_wind.bat/run_for_5min.bat请根据自己的实际情况进行配置
+4. 如果在入口bat中使用CALL调用其它bat，而其它bat中有pause也会有同样问题。如果是入口bat中使用start调用其它bat就没事。
+5. 编辑auto/run_tdx.au3文件，配置通达信软件的目录和窗口标题，配错了无法自动下载数据
+6. run_after_market_close.bat/run_for_wind.bat/run_for_5min.bat请根据自己的实际情况进行配置
 
 ## 使用方法
 - 数据准备，先bat下载数据。日线、5分钟、1分钟都可以通达信中直接下载。注意，已经退市股票无法下载。

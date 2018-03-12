@@ -21,7 +21,10 @@ print(pricing)
 
 # 向前复权
 pricing['Close_forward_factor'] = pricing['Close'] * pricing['forward_factor']
-print(pricing)
+print(pricing.tail())
 # 向后复权
 pricing['Close_backward_factor'] = pricing['Close'] * pricing['backward_factor']
+print(pricing)
+
+pricing = get_price(['IF.'], start_date='2010-01-01', bar_size=86400)
 print(pricing)

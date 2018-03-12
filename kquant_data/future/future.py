@@ -7,13 +7,13 @@ import os
 
 import pandas as pd
 
-from ..config import __CONFIG_H5_FUT_DIR__
+from ..config import __CONFIG_H5_FUT_MARKET_DATA_DIR__
 
 
 def bar_size_2_folder(bar_size):
     ret = {
         86400: '86400_DEF1_MC1',
-        3600: '3600_DEF1_MC1_EXT',
+        3600: '3600_DEF1_MC1_1530_EXT',
     }[bar_size]
     return ret
 
@@ -31,6 +31,6 @@ def get_absolute_path(root_dir, market, code, bar_size):
 
 
 def read_h5(market, code, bar_size):
-    path = get_absolute_path(__CONFIG_H5_FUT_DIR__, market, code, bar_size)
+    path = get_absolute_path(__CONFIG_H5_FUT_MARKET_DATA_DIR__, market, code, bar_size)
     df = pd.read_hdf(path)
     return df

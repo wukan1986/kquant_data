@@ -3,11 +3,21 @@
 """
 下载行业分类相关信息
 """
+import sys
 from WindPy import w
 from datetime import datetime
 from kquant_data.wind.tdays import read_tdays
 from kquant_data.wind_resume.wset import download_sector, download_sectors
 from kquant_data.config import __CONFIG_H5_STK_SECTOR_DIR__, __CONFIG_TDAYS_SSE_FILE__
+
+
+# 解决Python 3.6的pandas不支持中文路径的问题
+print(sys.getfilesystemencoding())  # 查看修改前的
+try:
+    sys._enablelegacywindowsfsencoding()  # 修改
+    print(sys.getfilesystemencoding())  # 查看修改后的
+except:
+    pass
 
 if __name__ == '__main__':
     w.start()

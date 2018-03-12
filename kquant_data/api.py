@@ -54,7 +54,11 @@ def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=No
     _dict = collections.OrderedDict()
     _fields = None
     for symbol in symbols:
-        code, market = split_by_dot(symbol)
+        code_market = split_by_dot(symbol)
+        if (len(code_market) == 2):
+            code, market = code_market
+        else:
+            code, market = code_market[0], ''
 
         df = _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields)
         _fields = df.columns

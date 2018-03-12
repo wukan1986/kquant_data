@@ -46,7 +46,7 @@ __CONFIG_H5_FUT_DATA_DIR__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'data')
 
 __CONFIG_TDAYS_SHFE_FILE__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'tdays', 'SHFE.csv')
 
-
+__CONFIG_H5_FUT_MARKET_DATA_DIR__ = r'D:\DATA_FUT_HDF5\Data_P2'
 
 
 
