@@ -16,7 +16,7 @@ from .processing.utils import filter_dataframe
 from .stock.stock import read_h5_tdx
 
 
-def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields):
+def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path):
     market = market.upper()
 
     if market == 'SH' or market == 'SZ':
@@ -24,7 +24,7 @@ def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fi
         df = read_h5_tdx(market, code, bar_size, __CONFIG_H5_STK_DIR__, __CONFIG_TDX_STK_DIR__,
                          __CONFIG_H5_STK_DIVIDEND_DIR__)
     else:
-        df = read_h5(market, code, bar_size)
+        df = read_h5(market, code, bar_size, path)
 
     # 除完权后再过滤，主要为修正时间
     df = filter_dataframe(df, 'DateTime', start_date, end_date, fields)
@@ -32,7 +32,7 @@ def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fi
     return df
 
 
-def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=None):
+def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=None, path=None):
     """
     从通达信中取数据，没有除权的可以直接读，但除权的需要拿到除权因子才能用
     这样的话相当于日线需要转一次，所以可以在本地为日线存一次HDF5
@@ -60,7 +60,7 @@ def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=No
         else:
             code, market = code_market[0], ''
 
-        df = _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields)
+        df = _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path)
         _fields = df.columns
         _dict[symbol] = df
 

@@ -17,7 +17,7 @@ REM 合并日线数据
 python.exe %~dp0..\demo_stock\A_1day\B03_merge.py
 
 REM 请根据自己的需求选择
-start run_for_wind_stk.bat
-start run_for_5min.bat
+start %~dp0\run_for_wind_stk.bat
+REM start %~dp0\run_for_5min.bat
 
 pause

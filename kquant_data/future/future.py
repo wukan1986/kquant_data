@@ -30,7 +30,12 @@ def get_absolute_path(root_dir, market, code, bar_size):
     return os.path.join(root_dir, get_relative_path(market, code, bar_size))
 
 
-def read_h5(market, code, bar_size):
-    path = get_absolute_path(__CONFIG_H5_FUT_MARKET_DATA_DIR__, market, code, bar_size)
-    df = pd.read_hdf(path)
+def read_h5(market, code, bar_size, path):
+    if path is None:
+        _path = get_absolute_path(__CONFIG_H5_FUT_MARKET_DATA_DIR__, market, code, bar_size)
+    else:
+        file_ext = 'h5'
+        filename = "%s.%s" % (code, file_ext)
+        _path = os.path.join(path, filename)
+    df = pd.read_hdf(_path)
     return df
