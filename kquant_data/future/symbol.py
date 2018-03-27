@@ -29,7 +29,7 @@ INE = ['sc']
 # 不活跃的合约
 InactiveProducts = ['b', 'fu', 'wr', 'JR', 'bb', 'LR', 'fb', 'RI', 'PM', 'RS', 'SF', 'SM']
 # 改名前的合约或过期的合约
-ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'TS', 'TT', 'im', 'sc']  # 从AF开始的几个是没有上市的
+ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'TS', 'TT', 'im']  # 从AF开始的几个是没有上市的
 # 有夜盘的
 NightProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC']
 

@@ -16,11 +16,13 @@ except:
 
 if __name__ == '__main__':
     rule = '1day'
-    sector_name = '风险警示股票'
-    merge_sector(rule, sector_name, 'ST')
+    if False:
+        sector_name = '风险警示股票'
+        merge_sector(rule, sector_name, 'ST')
 
-    sector_name = '中信证券一级行业指数'
-    merge_sectors(rule, sector_name, 'Sector')
+    if True:
+        sector_name = '中信证券一级行业指数'
+        merge_sectors(rule, sector_name, 'Sector')
 
     print("Done")
     debug = 1
