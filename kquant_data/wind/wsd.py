@@ -160,3 +160,26 @@ def download_daily_between_for_series(
     series_data = series_data[~series_data.index.duplicated(keep='last')]
 
     return series_data
+
+
+def download_daily_ohlcv(w, wind_code, start, end, exchange):
+    """
+    下载日线行情，由于有结算价，用于期货
+    为了加快下载，想办法取最长数据段
+    :param w:
+    :param wind_code:
+    :param start:
+    :param end:
+    :param exchange:
+    :return:
+    """
+    w.asDateTime = asDateTime
+    fields = 'open,high,low,close,volume,amt'
+    fields = 'open,high,low,close,volume,amt,oi,settle'
+    # 交易所是CFFEX一类的，而不是CFE一类的
+    w_wsd_data = w.wsd(wind_code, fields, start, end, 'TradingCalendar=%s' % exchange)
+    df = pd.DataFrame(w_wsd_data.Data, )
+    df = df.T
+    df.columns = w_wsd_data.Fields
+    df.index = w_wsd_data.Times
+    return df, w_wsd_data.Codes[0]
