@@ -45,6 +45,8 @@ def yyyyMMdd_2_datetime(dt):
     yyyyMMdd = int(dt)
     (yyyy, MMdd) = divmod(yyyyMMdd, 10000)
     (MM, dd) = divmod(MMdd, 100)
+    if yyyy == 0:
+        return None
 
     return datetime(yyyy, MM, dd, 0, 0)
 
@@ -57,6 +59,7 @@ def datetime_2_yyyyMMdd____(dt):
     """
     t = dt.timetuple()
     return float((t.tm_year * 10000.0 + t.tm_mon * 100 + t.tm_mday) * 10000.0)
+
 
 def datetime_2_yyyyMMdd(dt):
     """

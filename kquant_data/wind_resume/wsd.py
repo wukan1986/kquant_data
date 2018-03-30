@@ -121,7 +121,11 @@ def resume_download_daily_one_to_one_file(
 
     series = download_daily_between_for_series(w, df_old.iloc[:, 0], symbol, field, trading_days)
     # 去了na，会导致刚上市的数据一直下载，所以还是不去na
-    # series = series.dropna()
+    # 新改版，最后一条的nan不删，之前的nan需要删，这样就不会死循环了
+    if len(series) > 2:
+        series_tail = series.tail(1)
+        series = series.iloc[:-1].dropna()
+        series = pd.concat([series, series_tail])
     # 对数据进行清理
     series = series_drop_duplicated_keep_both_rolling(series)
 

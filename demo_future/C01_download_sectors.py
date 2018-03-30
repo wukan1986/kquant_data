@@ -4,12 +4,13 @@
 下载版块相关信息
 """
 import sys
-from WindPy import w
 from datetime import datetime, timedelta
+
+from WindPy import w
+
+from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__, __CONFIG_TDAYS_SHFE_FILE__
 from kquant_data.wind.tdays import read_tdays
 from kquant_data.wind_resume.wset import download_sector
-from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__, __CONFIG_TDAYS_SHFE_FILE__
-
 
 # 解决Python 3.6的pandas不支持中文路径的问题
 print(sys.getfilesystemencoding())  # 查看修改前的
@@ -37,6 +38,3 @@ if __name__ == '__main__':
     download_sector(w, new_trading_days, sector_name="郑商所全部品种", root_path=__CONFIG_H5_FUT_SECTOR_DIR__)
     new_trading_days = trading_days['2010-04-19':date_str]
     download_sector(w, new_trading_days, sector_name="中金所全部品种", root_path=__CONFIG_H5_FUT_SECTOR_DIR__)
-
-
-

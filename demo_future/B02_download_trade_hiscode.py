@@ -29,16 +29,17 @@ if __name__ == '__main__':
     # 下载最新一天的数据
     field = 'trade_hiscode'
 
-    # 下载最新一天，并且合并历史
-    date_str = (datetime.today() + timedelta(days=0)).strftime('%Y-%m-%d')
-    resume_download_financial_report_data_daily_latest(w, wind_codes, trading_days, __CONFIG_H5_FUT_FACTOR_DIR__, field,
-                                                       date_str)
+    if True:
+        # 下载最新一天，并且合并历史
+        date_str = (datetime.today() + timedelta(days=0)).strftime('%Y-%m-%d')
+        resume_download_financial_report_data_daily_latest(w, wind_codes, trading_days, __CONFIG_H5_FUT_FACTOR_DIR__, field,
+                                                           date_str)
 
-    # 使用下一个交易日
-    new_trading_days = trading_days[date_str:]
-    date_str = (new_trading_days.iloc[1, 0]).strftime('%Y-%m-%d')
-    resume_download_financial_report_data_daily_latest(w, wind_codes, trading_days, __CONFIG_H5_FUT_FACTOR_DIR__, field,
-                                                       date_str)
+        # 使用下一个交易日
+        new_trading_days = trading_days[date_str:]
+        date_str = (new_trading_days.iloc[1, 0]).strftime('%Y-%m-%d')
+        resume_download_financial_report_data_daily_latest(w, wind_codes, trading_days, __CONFIG_H5_FUT_FACTOR_DIR__, field,
+                                                           date_str)
 
     # 补数据
     resume_download_daily_to_many_files(w, trading_days, contract_issuedate, __CONFIG_H5_FUT_FACTOR_DIR__, field)
