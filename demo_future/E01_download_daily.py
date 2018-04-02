@@ -8,6 +8,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+import numpy as np
 import pandas as pd
 from WindPy import w
 
@@ -43,7 +44,12 @@ def read_constituent_at_date(dirpath, date):
 
 def merge_constituent_date(constituent, ipo_last_trade, first_last):
     constituent_dt = constituent.merge(ipo_last_trade, how='left', left_on='wind_code', right_on='wind_code')
-    constituent_dt = constituent_dt.merge(first_last, how='left', left_on='wind_code', right_index=True)
+    if first_last is None:
+        constituent_dt['first'] = pd.NaT
+        constituent_dt['last'] = pd.NaT
+    else:
+        constituent_dt = constituent_dt.merge(first_last, how='left', left_on='wind_code', right_index=True)
+
     constituent_dt['start'] = constituent_dt.apply(lambda row: max(row['ipo_date'], row['last']), axis=1)
     constituent_dt['end'] = constituent_dt.apply(lambda row: min(row['lasttrade_date'], datetime.today()), axis=1)
     # 没有结束时间的，调整成当前时间
@@ -83,6 +89,8 @@ def download_constituent_daily(w, dirpath, date, ipo_last_trade, first_last, win
         path_csv = os.path.join(path_dir, '%s.csv' % wind_code)
         try:
             df_old = pd.read_csv(path_csv, index_col=0, parse_dates=True)
+            # 合并前先删除空数据
+            df_old.dropna(axis=0, how='all', thresh=3, inplace=True)
         except:
             df_old = None
         print(row)
