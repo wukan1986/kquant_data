@@ -3,15 +3,18 @@
 """
 下载合约日线
 由于数据量不是很大，可以全下
+一定要通过update_first_last.py更新数据的下载范围
+否则会全下，还会覆盖前面的数据
+
+update_first_last.py根据自己的数据仓库的实际情况自己另行实现
+比如数据仓库是数据库，或hdf5格式的文件
 """
 import os
 import sys
 from datetime import datetime, timedelta
 
-import numpy as np
 import pandas as pd
 from WindPy import w
-
 from kquant_data.config import __CONFIG_TDAYS_SHFE_FILE__, __CONFIG_H5_FUT_SECTOR_DIR__
 from kquant_data.utils.symbol import split_alpha_number
 from kquant_data.utils.xdatetime import yyyyMMdd_2_datetime
@@ -125,13 +128,6 @@ if __name__ == '__main__':
     wind_code_set = set()
 
     if True:
-        fields = 'open,high,low,close,volume'
-        dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '南华期货商品指数')
-        for i in range(len(trading_days)):
-            wind_code_set = download_constituent_daily(w, dirpath, trading_days['date'][i], ipo_last_trade, first_last,
-                                                       wind_code_set, fields)
-
-    if False:
         fields = 'open,high,low,close,volume,amt,oi,settle'
         dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '中金所全部品种')
         for i in range(len(trading_days)):
@@ -149,6 +145,15 @@ if __name__ == '__main__':
                                                        wind_code_set, fields)
 
         dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '郑商所全部品种')
+        for i in range(len(trading_days)):
+            wind_code_set = download_constituent_daily(w, dirpath, trading_days['date'][i], ipo_last_trade, first_last,
+                                                       wind_code_set, fields)
+
+    # 只要对应的创建南华期货商品指数的板块文件夹，然后在里面建立一个0.csv表示每天都有，不会退市
+    # 然后在ipo_last_trade_trading.csv中标记上市日期与结束日期即可
+    if True:
+        fields = 'open,high,low,close,volume'
+        dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '南华期货商品指数')
         for i in range(len(trading_days)):
             wind_code_set = download_constituent_daily(w, dirpath, trading_days['date'][i], ipo_last_trade, first_last,
                                                        wind_code_set, fields)

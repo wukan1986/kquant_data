@@ -127,6 +127,17 @@ def CZCE_convert(symbol):
     return symbol
 
 
+def wind_code_2_InstrumentID(df, field):
+    sym_ex = df[field].str.split('.')
+    sym_ex = list(sym_ex)
+    sym_ex_df = pd.DataFrame(sym_ex, index=df.index)
+    sym_ex_df.columns = ['InstrumentID', 'exchange']
+    df = pd.concat([df, sym_ex_df], axis=1)
+    df['lower'] = (df['exchange'] == 'SHF') | (df['exchange'] == 'DCE') | (df['exchange'] == 'INE')
+    df['InstrumentID'][df['lower']] = df['InstrumentID'].str.lower()
+    return df
+
+
 if __name__ == '__main__':
     x = get_actvie_products_wind()
     print(x)

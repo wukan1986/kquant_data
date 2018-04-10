@@ -6,6 +6,9 @@
 比如
 主力、次主力
 近月、远月
+
+一定要通过update_first_last.py更新数据的下载范围
+否则会全下，还会覆盖前面的数据
 """
 import os
 import sys
@@ -91,7 +94,7 @@ def download_constituent_min(w, dirpath, date, ipo_last_trade, first_last, wind_
             print(path_csv)
             df.to_csv(path_csv)
         # 只做一个测试
-        break
+        # break
 
     return wind_code_set
 
@@ -125,6 +128,26 @@ if __name__ == '__main__':
     wind_code_set = set()
 
     dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '中金所全部品种')
+    for i in range(len(trading_days_slice)):
+        wind_code_set = download_constituent_min(w, dirpath, trading_days_slice['date'][i], ipo_last_trade, first_last,
+                                                 wind_code_set, trading_days)
+
+    dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '中金所全部品种')
+    for i in range(len(trading_days_slice)):
+        wind_code_set = download_constituent_min(w, dirpath, trading_days_slice['date'][i], ipo_last_trade, first_last,
+                                                 wind_code_set, trading_days)
+
+    dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '上期所全部品种')
+    for i in range(len(trading_days_slice)):
+        wind_code_set = download_constituent_min(w, dirpath, trading_days_slice['date'][i], ipo_last_trade, first_last,
+                                                 wind_code_set, trading_days)
+
+    dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '大商所全部品种')
+    for i in range(len(trading_days_slice)):
+        wind_code_set = download_constituent_min(w, dirpath, trading_days_slice['date'][i], ipo_last_trade, first_last,
+                                                 wind_code_set, trading_days)
+
+    dirpath = os.path.join(__CONFIG_H5_FUT_SECTOR_DIR__, '郑商所全部品种')
     for i in range(len(trading_days_slice)):
         wind_code_set = download_constituent_min(w, dirpath, trading_days_slice['date'][i], ipo_last_trade, first_last,
                                                  wind_code_set, trading_days)

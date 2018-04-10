@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-下载合约信息
+更新数据范围列表，用于下载数据时减少重复下载
 """
 import os
 import sys
@@ -47,13 +47,21 @@ def get_first_last(root_path):
                     # 删除无效行
                     # 南华在收盘前只能下到收盘价，并且收盘价还是昨天的
                     df_csv.dropna(axis=0, how='all', thresh=3, inplace=True)
+                    if df_csv.empty:
+                        continue
 
-                    df.loc[wind_code] = None
-                    df.loc[wind_code]['first'] = datetime.max
-                    df.loc[wind_code]['last'] = datetime.min
-                    df.loc[wind_code]['first'] = min(df_csv.index[0], df.loc[wind_code]['first'])
-                    df.loc[wind_code]['last'] = max(df_csv.index[-1], df.loc[wind_code]['last'])
+                    first = df_csv.index[0]
+                    last = df_csv.index[-1]
 
+                    try:
+                        df.loc[wind_code]['first'] = min(first, df.loc[wind_code]['first'])
+                        df.loc[wind_code]['last'] = max(last, df.loc[wind_code]['last'])
+                    except:
+                        df.loc[wind_code] = None
+                        df.loc[wind_code]['first'] = first
+                        df.loc[wind_code]['last'] = last
+
+    # 直接保存在当前目录下
     path = os.path.join(root_path, 'first_last.csv')
     df.index.name = 'wind_code'
     df.to_csv(path)
