@@ -11,20 +11,27 @@ import os
 import pandas as pd
 from .utils.symbol import split_by_dot
 from .config import __CONFIG_H5_STK_DIR__, __CONFIG_TDX_STK_DIR__, __CONFIG_H5_STK_DIVIDEND_DIR__
-from .future.future import read_h5
+from .future.future import read_future
 from .processing.utils import filter_dataframe
 from .stock.stock import read_h5_tdx
+from .stock.tdx import read_file
+from .option.option import read_option
 
 
-def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path):
+def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path, instrument_type):
     market = market.upper()
 
-    if market == 'SH' or market == 'SZ':
-        # 从通达信中获取
-        df = read_h5_tdx(market, code, bar_size, __CONFIG_H5_STK_DIR__, __CONFIG_TDX_STK_DIR__,
-                         __CONFIG_H5_STK_DIVIDEND_DIR__)
-    else:
-        df = read_h5(market, code, bar_size, path)
+    if instrument_type == 'stock':
+        if market == 'SH' or market == 'SZ':
+            # 由于除权问题，所以是两层数据
+            df = read_h5_tdx(market, code, bar_size, __CONFIG_H5_STK_DIR__, __CONFIG_TDX_STK_DIR__,
+                             __CONFIG_H5_STK_DIVIDEND_DIR__)
+    elif instrument_type == 'future':
+        # 指定的是目录
+        df = read_future(market, code, bar_size, path)
+    elif instrument_type == 'option':
+        # 需要指定目录才好
+        df = read_option(market, code, bar_size, path)
 
     # 除完权后再过滤，主要为修正时间
     df = filter_dataframe(df, 'DateTime', start_date, end_date, fields)
@@ -32,17 +39,20 @@ def _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fi
     return df
 
 
-def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=None, path=None):
+def get_price(symbols, instrument_type, start_date=None, end_date=None, bar_size=86400, fields=None, path=None,
+              new_symbols=None):
     """
     从通达信中取数据，没有除权的可以直接读，但除权的需要拿到除权因子才能用
     这样的话相当于日线需要转一次，所以可以在本地为日线存一次HDF5
     通达信中目前只有日线、5分钟、1分钟
     :param symbols:
+    :param instrument_type:
     :param start_date:
     :param end_date:
     :param bar_size:
     :param fields:
-    :param adjust_type:
+    :param path:
+    :param new_symbols: 50ETF期权需要将数字转成符号，方便使用
     :return:
     """
     # 将str转成list
@@ -50,19 +60,23 @@ def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=No
         symbols = [symbols]
     if isinstance(fields, str):
         fields = [fields]
+    if new_symbols is None:
+        new_symbols = symbols
+    if isinstance(new_symbols, str):
+        new_symbols = [new_symbols]
 
     _dict = collections.OrderedDict()
     _fields = None
-    for symbol in symbols:
+    for idx, symbol in enumerate(symbols):
         code_market = split_by_dot(symbol)
-        if (len(code_market) == 2):
+        if len(code_market) == 2:
             code, market = code_market
         else:
             code, market = code_market[0], ''
 
-        df = _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path)
+        df = _get_date_from_file(symbol, market, code, bar_size, start_date, end_date, fields, path, instrument_type)
         _fields = df.columns
-        _dict[symbol] = df
+        _dict[new_symbols[idx]] = df
 
     # 只有一个合约，直接输出单个合约的表
     if len(_dict) == 1:
@@ -92,7 +106,7 @@ def get_price(symbols, start_date=None, end_date=None, bar_size=86400, fields=No
                 _dict2[c] = _df
 
     for (k, v) in _dict2.items():
-        v.columns = symbols
+        v.columns = new_symbols
         # v.columns = list(_dict.keys())
 
     return pd.Panel(_dict2)

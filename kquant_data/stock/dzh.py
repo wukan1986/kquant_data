@@ -56,7 +56,7 @@ class DzhFetcher(object):
         try:
             r = urllib
             data = r.read()
-            self.f = xio.StringIO(data)
+            self.f = io.StringIO(data)
             self._fetched = True
         except urllib.URLError:
             return self.fetch_next_server()

@@ -9,8 +9,8 @@ REM 由于最新版通达信不能在虚拟机中运行，只能安装2017年6月份以前版本
 "D:\Program Files (x86)\AutoIt3\autoit3.exe" /ErrorStdOut "%~dp0\run_tdx.au3" 
 
 
-REM 下载除权数据
-python.exe %~dp0..\demo_stock\A_1day\B01_download_pwr.py
+REM 导出除权数据
+python.exe %~dp0..\demo_stock\A_1day\B01_export_gbbq.py
 REM 导出日线数据
 python.exe %~dp0..\demo_stock\A_1day\B02_export.py
 REM 合并日线数据

@@ -9,7 +9,7 @@ import pandas as pd
 
 from kquant_data.config import __CONFIG_DZH_PWR_FILE__, __CONFIG_H5_STK_DIVIDEND_DIR__, __CONFIG_TDX_STK_DIR__, \
     __CONFIG_H5_STK_DIR__
-from kquant_data.stock.stock import export_dividend_daily
+from kquant_data.stock.stock import export_dividend_daily_gbbq
 from kquant_data.stock.symbol import get_symbols_from_path_only_stock
 
 
@@ -19,11 +19,12 @@ def export_daily():
     :return:
     """
     # 复权因子的导出
-    dividend_input = __CONFIG_DZH_PWR_FILE__
+    dividend_input = os.path.join(__CONFIG_H5_STK_DIR__, 'gbbq.csv')
     dividend_output = __CONFIG_H5_STK_DIVIDEND_DIR__
     daily_input = os.path.join(__CONFIG_TDX_STK_DIR__, "vipdoc")
     daily_output = os.path.join(__CONFIG_H5_STK_DIR__, "1day")
-    export_dividend_daily(dividend_input, daily_input, dividend_output, daily_output)
+    # export_dividend_daily(dividend_input, daily_input, dividend_output, daily_output)
+    export_dividend_daily_gbbq(dividend_input, daily_input, dividend_output, daily_output)
 
 
 def export_symbols():

@@ -10,7 +10,7 @@ from functools import partial
 import pandas as pd
 
 from ..processing.utils import filter_dataframe
-from ..utils.xdatetime import datetime_2_yyyyMMdd____, yyyyMMddHHmm_2_datetime, tic, toc
+from ..utils.xdatetime import datetime_2_yyyyMMdd____, yyyyMMddHHmm_2_datetime, tic, toc, yyyyMMdd_2_datetime
 from .dzh import DzhDividend, dividend_to_h5
 from .tdx import read_file, bars_to_h5, get_h5_86400_path, get_tdx_path
 
@@ -43,7 +43,12 @@ def factor(daily, divs):
     :return:
     """
     # 排序复权因子,一定要用，因为会更新时间格式
-    df = sort_dividend(divs)
+    if False:
+        df = sort_dividend(divs)
+    else:
+        df = divs
+        df['time'] = df['time'].apply(lambda x: yyyyMMdd_2_datetime(x))
+        df = df.set_index('time')
 
     # 过滤一下，用来计算除权价
     daily_part = daily[['DateTime', 'DateTime', 'Close']]
@@ -200,7 +205,15 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
     divs = data[1]
     print(symbol)
 
-    _symbol = symbol.lower().decode('utf-8')
+    if False:
+        _symbol = symbol.lower().decode('utf-8')
+    else:
+        _symbol = symbol
+        divs = divs[
+            ['datetime', 'songgu_qianzongguben', 'peigu_houzongguben', 'peigujia_qianzongguben',
+             'hongli_panqianliutong']]
+        divs.columns = ['time', 'split', 'purchase', 'purchase_price', 'dividend']
+
     dividend_output_path = os.path.join(dividend_output, _symbol + '.h5')
 
     if _symbol.startswith('sh'):
@@ -224,7 +237,7 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
         print(e)
 
 
-def export_dividend_daily(dzh_input, tdx_root, dividend_output, daily_output):
+def export_dividend_daily_dzh(dzh_input, tdx_root, dividend_output, daily_output):
     """
     导出除权数据，并同时生成对应的日线数据
     :param tdx_input:
@@ -249,6 +262,42 @@ def export_dividend_daily(dzh_input, tdx_root, dividend_output, daily_output):
     else:
         # 单线程
         for d in list(r):
+            _export_dividend_from_data(tdx_root, dividend_output, daily_output, d)
+
+    toc()
+
+
+def export_dividend_daily_gbbq(gbbq_input, tdx_root, dividend_output, daily_output):
+    """
+    导出除权数据，并同时生成对应的日线数据
+    :param tdx_input:
+    :param dzh_input:
+    :param dzh_output:
+    :param daily_output:
+    :return:
+    """
+    df = pd.read_csv(gbbq_input, index_col=0, dtype={'code': str})
+    # 只取除权信息
+    df = df[df['category'] == 1]
+    df['exchange'] = df['market'].replace(0, "sz").replace(1, 'sh')
+    df['symbol'] = df['exchange'] + df['code']
+    div_list = [(name, group) for name, group in df.groupby(by=['symbol'])]
+
+    tic()
+
+    multi = True
+    if multi:
+        # 多进程并行计算
+        pool_size = multiprocessing.cpu_count()
+        if pool_size > 2:
+            pool_size -= 1
+        pool = multiprocessing.Pool(processes=pool_size)
+        func = partial(_export_dividend_from_data, tdx_root, dividend_output, daily_output)
+        pool_outputs = pool.map(func, div_list)
+        print('Pool:', pool_outputs)
+    else:
+        # 单线程
+        for d in div_list:
             _export_dividend_from_data(tdx_root, dividend_output, daily_output, d)
 
     toc()

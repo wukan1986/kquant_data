@@ -63,7 +63,7 @@ def day_datetime_long(dt):
     return float(dt * 10000.0)
 
 
-def read_file(path):
+def read_file(path, instrument_type='stock'):
     """
     http://www.tdx.com.cn/list_66_68.html
     通达信本地目录有day/lc1/lc5三种后缀名，两种格式
@@ -71,15 +71,21 @@ def read_file(path):
     :param path:
     :return:
     """
+    columns = ['DateTime', 'Open', 'High', 'Low', 'Close', 'Amount', 'Volume', 'na']
+
     file_ext = os.path.splitext(path)[1][1:]
-    ohlc_type = {'day': 'i4', '5': 'i4', 'lc1': 'f4', 'lc5': 'f4'}[file_ext]
+    if instrument_type == 'stock':
+        ohlc_type = {'day': 'i4', '5': 'i4', 'lc1': 'f4', 'lc5': 'f4'}[file_ext]
+        formats = ['i4'] + [ohlc_type] * 4 + ['f4'] + ['i4'] * 2
+    elif instrument_type == 'option':
+        ohlc_type = {'day': 'f4', '5': 'i4', 'lc1': 'f4', 'lc5': 'f4'}[file_ext]
+        formats = ['i4'] + [ohlc_type] * 4 + ['i4'] + ['i4'] * 2
     date_parser = {'day': day_datetime_long,
                    '5': min_datetime_long,
                    'lc1': min_datetime_long,
                    'lc5': min_datetime_long,
                    }[file_ext]
-    columns = ['DateTime', 'Open', 'High', 'Low', 'Close', 'Amount', 'Volume', 'na']
-    formats = ['i4'] + [ohlc_type] * 4 + ['f4'] + ['i4'] * 2
+
     dtype = np.dtype({'names': columns, 'formats': formats})
     data = np.fromfile(path, dtype=dtype)
     df = pd.DataFrame(data)
@@ -90,13 +96,14 @@ def read_file(path):
     df = df.drop('na', 1)
 
     # 有两种格式的数据的价格需要调整
-    if file_ext == 'day' or file_ext == '5':
-        tmp = df.tail(10)
-        r = tmp.Amount / tmp.Volume / tmp.Close
-        # 为了解决价格扩大了多少倍的问题
-        type_unit = np.power(10, np.round(np.log10(r))).median()
-        # 这个地方要考虑到实际情况，不要漏价格，也不要把时间做了除法
-        df.ix[:, 1:5] = df.ix[:, 1:5] * type_unit
+    if instrument_type == 'stock':
+        if file_ext == 'day' or file_ext == '5':
+            tmp = df.tail(10)
+            r = tmp.Amount / tmp.Volume / tmp.Close
+            # 为了解决价格扩大了多少倍的问题
+            type_unit = np.power(10, np.round(np.log10(r))).median()
+            # 这个地方要考虑到实际情况，不要漏价格，也不要把时间做了除法
+            df.ix[:, 1:5] = df.ix[:, 1:5] * type_unit
 
     # 转换格式，占用内存更少
     df['DateTime'] = df['DateTime'].astype(np.uint64)

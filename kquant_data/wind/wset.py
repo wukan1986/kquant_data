@@ -69,6 +69,30 @@ def download_indexconstituent(w, date, windcode, field='wind_code,i_weight'):
     return df
 
 
+def download_optioncontractbasicinfo(w, exchange='sse', windcode='510050.SH', status='trading',
+                                     field='wind_code,trade_code,sec_name,contract_unit,listed_date,expire_date,reference_price'):
+    """
+    指数权重
+    如果指定日期不是交易日，会返回时前一个交易日的信息
+    :param w:
+    :param windcode:
+    :param date:
+    :return:
+    """
+    param = 'exchange=%s' % exchange
+    param += ';windcode=%s' % windcode
+    param += ';status=%s' % status
+    if field:
+        param += ';field=%s' % field
+
+    w.asDateTime = asDateTime
+    w_wset_data = w.wset("optioncontractbasicinfo", param)
+    df = pd.DataFrame(w_wset_data.Data)
+    df = df.T
+    df.columns = w_wset_data.Fields
+    return df
+
+
 def read_constituent(path):
     """
     读取板块文件
