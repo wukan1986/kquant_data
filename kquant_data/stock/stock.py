@@ -47,7 +47,7 @@ def factor(daily, divs):
         df = sort_dividend(divs)
     else:
         df = divs
-        df['time'] = df['time'].apply(lambda x: yyyyMMdd_2_datetime(x))
+        df.loc[:, 'time'] = df.loc[:, 'time'].apply(lambda x: yyyyMMdd_2_datetime(x))
         df = df.set_index('time')
 
     # 过滤一下，用来计算除权价
@@ -73,7 +73,7 @@ def factor(daily, divs):
 
     # 除权价
     df['dr_pre_close'] = (df['pre_close'] - df['dividend'] + df['purchase'] * df['purchase_price']) / (
-        1 + df['split'] + df['purchase'])
+            1 + df['split'] + df['purchase'])
     # 要做一次四舍五入,不然除权因子不对,2是不是不够，需要用到3呢？
     df['dr_pre_close'] = df['dr_pre_close'].apply(lambda x: round(x, 2))
     # 除权因子
@@ -213,6 +213,8 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
             ['datetime', 'songgu_qianzongguben', 'peigu_houzongguben', 'peigujia_qianzongguben',
              'hongli_panqianliutong']]
         divs.columns = ['time', 'split', 'purchase', 'purchase_price', 'dividend']
+        # 通达信中记录的是每10股，大智慧中记录的是每1股，这里转成大智慧的格式
+        divs[['split', 'purchase', 'dividend']] /= 10
 
     dividend_output_path = os.path.join(dividend_output, _symbol + '.h5')
 
@@ -227,8 +229,10 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
         # 宏证证券000562退市了，导致找不到股票行情，但还有除权数据
         tdx_daily = read_file(daily_input_path)
         df_divs = factor(tdx_daily, divs)
+
         # 保存时还是把权息给加上，这样少了调用时的合并操作
         daily_divs = merge_adjust_factor(tdx_daily, df_divs)
+        del df_divs['index_datetime']
 
         # 保存
         bars_to_h5(daily_output_path, daily_divs)
@@ -251,7 +255,7 @@ def export_dividend_daily_dzh(dzh_input, tdx_root, dividend_output, daily_output
 
     tic()
 
-    multi = True
+    multi = False
     if multi:
         # 多进程并行计算
         pool_size = multiprocessing.cpu_count() - 1

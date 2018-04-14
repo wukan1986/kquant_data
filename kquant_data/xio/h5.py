@@ -21,7 +21,7 @@ def write_dataframe_set_struct_keep_head(path, data, dtype, dateset_name):
     """
     f = h5py.File(path, 'w')
 
-    r = data.to_records()
+    r = data.to_records(index=False)
     d = np.array(r, dtype=dtype)
 
     f.create_dataset(dateset_name, data=d, compression="gzip", compression_opts=6)
