@@ -13,6 +13,7 @@ from ..processing.utils import filter_dataframe
 from ..utils.xdatetime import datetime_2_yyyyMMdd____, yyyyMMddHHmm_2_datetime, tic, toc, yyyyMMdd_2_datetime
 from .dzh import DzhDividend, dividend_to_h5
 from .tdx import read_file, bars_to_h5, get_h5_86400_path, get_tdx_path
+from .symbol import is_stock
 
 
 def sort_dividend(divs):
@@ -31,7 +32,7 @@ def sort_dividend(divs):
     return df
 
 
-def factor(daily, divs):
+def factor(daily, divs, ndigits):
     """
     计算得到向后复权因子
     发现这种算法没有错，但很多股票还是有一些与万得对应不上
@@ -40,6 +41,7 @@ def factor(daily, divs):
     可以对照一下通达信与万得的行情，哪种价格对应得上
     :param daily:
     :param divs:
+    :param ndigits: 股票保留两位小数，基金保留三位小数
     :return:
     """
     # 排序复权因子,一定要用，因为会更新时间格式
@@ -75,7 +77,7 @@ def factor(daily, divs):
     df['dr_pre_close'] = (df['pre_close'] - df['dividend'] + df['purchase'] * df['purchase_price']) / (
             1 + df['split'] + df['purchase'])
     # 要做一次四舍五入,不然除权因子不对,2是不是不够，需要用到3呢？
-    df['dr_pre_close'] = df['dr_pre_close'].apply(lambda x: round(x, 2))
+    df['dr_pre_close'] = df['dr_pre_close'].apply(lambda x: round(x, ndigits))
     # 除权因子
     df['dr_factor'] = df['pre_close'] / df['dr_pre_close']
 
@@ -216,6 +218,10 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
         # 通达信中记录的是每10股，大智慧中记录的是每1股，这里转成大智慧的格式
         divs[['split', 'purchase', 'dividend']] /= 10
 
+    # 测试使用
+    # if _symbol != 'sh510050':
+    #     return
+
     dividend_output_path = os.path.join(dividend_output, _symbol + '.h5')
 
     if _symbol.startswith('sh'):
@@ -228,7 +234,11 @@ def _export_dividend_from_data(tdx_root, dividend_output, daily_output, data):
     try:
         # 宏证证券000562退市了，导致找不到股票行情，但还有除权数据
         tdx_daily = read_file(daily_input_path)
-        df_divs = factor(tdx_daily, divs)
+        ndigits = 2
+        # 股票两位小数，基金3位小数，如50etf
+        if not is_stock(_symbol):
+            ndigits = 3
+        df_divs = factor(tdx_daily, divs, ndigits)
 
         # 保存时还是把权息给加上，这样少了调用时的合并操作
         daily_divs = merge_adjust_factor(tdx_daily, df_divs)
