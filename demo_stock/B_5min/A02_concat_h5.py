@@ -56,6 +56,7 @@ def _export_data(rule, _input, output, instruments, i):
 
 
 if __name__ == '__main__':
+    # 此合并h5的代码已经废弃不用
     _input = '5min_lc5'
     _ouput = '5min'
     instruments = get_folder_symbols(__CONFIG_H5_STK_DIR__, _input)

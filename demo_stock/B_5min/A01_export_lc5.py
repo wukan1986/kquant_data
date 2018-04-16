@@ -46,6 +46,8 @@ def export_symbols():
 if __name__ == '__main__':
     _input = 'fzline'
     _ouput = '5min_lc5'
+    # 由于直接5转lc5格式已经提前做了，所以这里不再需要都保存成h5再合并了
+    _ouput = '5min'
     instruments = export_symbols()
 
     multiprocessing_convert(True, '5min', _input, _ouput, instruments, _export_data)
