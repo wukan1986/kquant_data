@@ -3,6 +3,9 @@
 """
 
 """
+import os
+
+from ..config import __CONFIG_H5_OPT_DIR__
 from ..xio.csv import read_data_dataframe
 
 
@@ -22,7 +25,9 @@ def read_optioncontractbasicinfo(path):
 10001131	510050C1806M02750	50ETF购6月2.75	10000	12/1/2017 0:00
 
     由于执行价重复，所以不同软件显示不同
-    万得显示的是老合约，而通达信显示的是新合约
+    万得和通达信都列出了两个6月，另一个是6月-A
+
+    wind_code 不会变，但对应的trade_code和exx_price是发生变动的
     :param path:
     :return:
     """
@@ -43,3 +48,33 @@ def read_optioncontractbasicinfo(path):
     df = df.merge(df_extract2[['exercise_price']], how='left', left_index=True, right_index=True)
     df.index = df.index.astype(str)
     return df
+
+
+def get_opt_info(filename):
+    root_path = os.path.join(__CONFIG_H5_OPT_DIR__, 'optioncontractbasicinfo', filename)
+    df_info = read_optioncontractbasicinfo(root_path)
+    # 排序一下，方便显示，先按月份，然再换名后的月份
+    df_info = df_info.sort_values(by=['limit_month', 'limit_month_m', 'call_or_put', 'exercise_price'])
+    return df_info
+
+
+def get_opt_info_filtered_by_date(df_info, date):
+    # date = '2018-03-04'  # 指定日期
+    # call_or_put = 'C'  # 指定类别
+    # limit_month = 1806  # 指定月份
+    # limit_month_m = 'A'  # 指定月份2
+    df_filtered = df_info[(df_info['listed_date'] <= date)
+                          & (df_info['expire_date'] >= date)]
+    return df_filtered
+
+
+def get_opt_info_filtered_by_month(df_info, limit_month):
+    df_filtered = df_info[
+        (df_info['limit_month'] == limit_month)]
+    return df_filtered
+
+
+def get_opt_info_filtered_by_call_or_put(df_info, call_or_put):
+    df_filtered = df_info[
+        (df_info['call_or_put'] == call_or_put)]
+    return df_filtered

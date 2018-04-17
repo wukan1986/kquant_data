@@ -3,6 +3,7 @@
 """
 数据处理的小工具
 """
+import os
 import datetime
 import numpy as np
 import pandas as pd
@@ -10,6 +11,7 @@ import multiprocessing
 from functools import partial
 
 from ..utils.xdatetime import yyyyMMddHHmm_2_datetime, datetime_2_yyyyMMddHHmm, tic, toc
+from ..xio.csv import read_data_dataframe
 
 
 def expand_dataframe_according_to(df, index, columns):
@@ -167,3 +169,59 @@ def multiprocessing_convert(multi, rule, _input, output, instruments, func_conve
             func_convert(rule, _input, output, instruments, i)
 
     toc()
+
+
+
+def dataframe_align_copy(df1, df2):
+    """
+    两个DataFrame，将其中的数据复制到另一个
+    :param df1:
+    :param df2:
+    :return:
+    """
+    index = df1.index.intersection(df2.index)
+    columns = df1.columns.intersection(df2.columns)
+
+    # 由于两边的数据不配套，所以只能复制重合部分
+    df1.ix[index, columns] = df2.ix[index, columns]
+
+    return df1
+
+
+def read_fill_from_file(path, date, field, df):
+    """
+    将一个文件中的内容合并到一个df中
+    :param path:
+    :param date:
+    :param field:
+    :param df:
+    :return:
+    """
+    _path = path % date
+    x = read_data_dataframe(_path)
+    # 去掉.SH
+    x['wind_code'] = x['option_code'].str.extract('(\d{8})\.', expand=False)
+    x.set_index(['wind_code'], inplace=True)
+    y = x[[field]]
+    y.columns = [date]
+    y = y.T
+    y.index = pd.to_datetime(y.index)
+
+    df = dataframe_align_copy(df, y)
+    return df
+
+
+def read_fill_from_dir(path, field, df):
+    """
+    将一个目录下的合并到一个df中
+    :param path:
+    :param field:
+    :param df:
+    :return:
+    """
+    for dirpath, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            shotname, extension = os.path.splitext(filename)
+            _path = os.path.join(dirpath, '%s.csv')
+            df = read_fill_from_file(_path, shotname, field, df)
+    return df

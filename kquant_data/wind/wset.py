@@ -93,6 +93,30 @@ def download_optioncontractbasicinfo(w, exchange='sse', windcode='510050.SH', st
     return df
 
 
+def download_optionchain(w, date='2017-11-28', us_code='510050.SH',
+                         field='option_code,option_name,strike_price,multiplier'):
+    """
+    下载指定日期期权数据
+
+w_wset_data = vba_wset("optionchain","date=2017-11-28;us_code=510050.SH;option_var=全部;call_put=全部;field=option_code,option_name,strike_price,multiplier",)
+    :param w:
+    :param windcode:
+    :param date:
+    :return:
+    """
+    param = 'date=%s' % date
+    param += ';us_code=%s' % us_code
+    if field:
+        param += ';field=%s' % field
+
+    w.asDateTime = asDateTime
+    w_wset_data = w.wset("optionchain", param)
+    df = pd.DataFrame(w_wset_data.Data)
+    df = df.T
+    df.columns = w_wset_data.Fields
+    return df
+
+
 def read_constituent(path):
     """
     读取板块文件

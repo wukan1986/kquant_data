@@ -11,7 +11,7 @@ w_wset_data = vba_wset("optioncontractbasicinfo","exchange=sse;windcode=510050.S
 from WindPy import w
 import os
 import pandas as pd
-from kquant_data.config import __CONFIG_H5_FUT_DIR__
+from kquant_data.config import __CONFIG_H5_OPT_DIR__
 from kquant_data.wind.wset import download_optioncontractbasicinfo
 from kquant_data.xio.csv import write_data_dataframe, read_data_dataframe
 
@@ -21,7 +21,7 @@ from kquant_data.option.info import read_optioncontractbasicinfo
 if __name__ == '__main__':
     # w.start()
 
-    root_path = os.path.join(__CONFIG_H5_FUT_DIR__, 'optioncontractbasicinfo', '510050.SH.csv')
+    root_path = os.path.join(__CONFIG_H5_OPT_DIR__, 'optioncontractbasicinfo', '510050.SH.csv')
 
     # 这个只要执行一次就可以了，以后每次更新时都跳过即可
     if False:
@@ -36,9 +36,8 @@ if __name__ == '__main__':
         df_new = df_new.set_index('wind_code')
 
         df = pd.concat([df_old, df_new])
-        #
+        # 将老数据删除，因为合约可能因为除权而变数据
         df = df[~df.index.duplicated(keep='last')]
-        # df.drop_duplicates(keep='last', inplace=True)
         write_data_dataframe(root_path, df)
 
     df = read_optioncontractbasicinfo(root_path)

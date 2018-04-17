@@ -50,6 +50,14 @@ __CONFIG_TDAYS_SHFE_FILE__ = os.path.join(__CONFIG_H5_FUT_DIR__, 'tdays', 'SHFE.
 
 __CONFIG_H5_FUT_MARKET_DATA_DIR__ = r'D:\DATA_FUT_HDF5\Data_P2'
 
+
+"""
+期权
+"""
+# 期货行情数据
+__CONFIG_H5_OPT_DIR__ = r'D:\DATA_OPT'
+
+
 # 为了将自定义库引入进来，注意这里要改
 # sys.path.append(r'D:\Python\Kan')
 # sys.path
