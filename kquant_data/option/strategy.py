@@ -28,6 +28,9 @@ def func_select_instrument_by_signal(row, field, _open, df_info, month_index, at
     signal = row[field]
     if np.isnan(signal):
         return row
+    if signal == 0:
+        row[field] = np.nan
+        return row
     # 取指定日期的数据
     date = row['index_datetime'].strftime("%Y-%m-%d")  # 指定日期
 
