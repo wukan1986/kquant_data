@@ -60,7 +60,7 @@ class MergeBar(object):
         return None
 
     def _save_data(self, folder, raw_data, field):
-        data = raw_data.as_matrix()
+        data = raw_data.astype(np.float64).as_matrix()
         path = os.path.join(folder, field + '.h5')
         file = h5py.File(path, 'w')
         file.create_dataset(field, data=data, compression="gzip", compression_opts=6)
@@ -71,8 +71,8 @@ class MergeBar(object):
         t = instruments.iloc[i]
         print("%d %s" % (i, t['local_symbol']))
         df = self.read_data(t['market'], t['code'], self.bar_size)
-        # if df is None:
-        #     debug = 1
+        if df is None:
+            return None
         del df['DateTime']
         df = pd.merge(df, datetime, left_index=True, right_index=True, how='right', copy=False)
         df = filter_dataframe(df, None, None, None, self.fields)
@@ -89,11 +89,15 @@ class MergeBar(object):
         else:
             pool_outputs = []
             for i in range(len(instruments)):
-                pool_outputs.append(self._merge_data(datetime, instruments, i))
+                x = self._merge_data(datetime, instruments, i)
+                #if x is not None:
+                pool_outputs.append(x)
 
         print("数据已经全部读取完成")
         toc()
         print("回收一下内存:%d" % gc.collect())
+        # 其中可能有Nono的，需要处理成nan，不能丢弃，否则可能导致Symbol.csv对不上
+        # pool_outputs
         pool_outputs = pd.Panel(pool_outputs)  # 内存不够，可能崩溃
         pool_outputs = pool_outputs.transpose(1, 2, 0)
         print("数据转置完成")

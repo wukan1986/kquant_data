@@ -15,11 +15,8 @@ from kquant_data.wind_resume.wset import download_index_weight
 
 from kquant_data.config import __CONFIG_H5_STK_FACTOR_DIR__, __CONFIG_H5_STK_WEIGHT_DIR__, __CONFIG_TDAYS_SSE_FILE__
 
-if __name__ == '__main__':
-    # w.start()
-    date_str = datetime.today().strftime('%Y-%m-%d')
 
-    trading_days = read_tdays(__CONFIG_TDAYS_SSE_FILE__)
+def download_000300(w, trading_days):
     # 4月8号是指数的发布日期
     trading_days = trading_days['2005-04-08':date_str]
 
@@ -29,4 +26,24 @@ if __name__ == '__main__':
     date_index = read_data_dataframe(path)
 
     # dates = list(date_index.index)
+
     download_index_weight(w, trading_days, "000300.SH", __CONFIG_H5_STK_WEIGHT_DIR__)
+
+
+def download_000016(w, trading_days):
+    # 万得数据只到2009年4月1号，之前的数据没有
+    trading_days = trading_days['2009-04-01':date_str]
+
+    download_index_weight(w, trading_days, "000016.SH", __CONFIG_H5_STK_WEIGHT_DIR__)
+
+
+if __name__ == '__main__':
+    w.start()
+    date_str = datetime.today().strftime('%Y-%m-%d')
+
+    trading_days = read_tdays(__CONFIG_TDAYS_SSE_FILE__)
+
+    if True:
+        download_000300(w, trading_days)
+    if False:
+        download_000016(w, trading_days)

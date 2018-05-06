@@ -142,8 +142,8 @@ def move_constituent(path, dst_path):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             curr_df = read_constituent(filepath)
-            # if curr_df is None:
-            #    continue
+            if curr_df is None:
+                continue
             path_list.append(filepath)
             df_list.append(set(curr_df['wind_code']))
 
@@ -171,6 +171,8 @@ def move_constituent(path, dst_path):
                     dst_file = os.path.join(dst_path, src_file[1])
                     if os.path.exists(dst_file):
                         os.remove(dst_file)
+                    if not os.path.exists(dst_path):
+                        os.makedirs(dst_path)
                     shutil.move(path_list_3[i][1], dst_path)
                     path_list.append(path_list_3[i][0])
                     path_list.append(path_list_3[i][2])

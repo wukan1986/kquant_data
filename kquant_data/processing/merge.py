@@ -187,7 +187,7 @@ def merge_report(rule, field, dataset_name):
     write_dataframe_set_dtype_remove_head(path, df, None, field)
 
 
-def merge_weight(rule, wind_code, dataset_name):
+def merge_weight_internal(symbols, DateTime, wind_code):
     """
     合并一级文件夹
     :param rule:
@@ -195,12 +195,6 @@ def merge_weight(rule, wind_code, dataset_name):
     :param dataset_name:
     :return:
     """
-    path = os.path.join(__CONFIG_H5_STK_DIR__, rule, 'Symbol.csv')
-    symbols = all_instruments(path)
-
-    path = os.path.join(__CONFIG_H5_STK_DIR__, rule, 'DateTime.csv')
-    DateTime = get_datetime(path)
-
     tic()
     path = os.path.join(__CONFIG_H5_STK_WEIGHT_DIR__, wind_code)
     df = load_index_weight(path)
@@ -218,6 +212,25 @@ def merge_weight(rule, wind_code, dataset_name):
     df.replace(-1, np.nan, inplace=True)
     print("数据加载完成")
     toc()
+
+    return df
+
+
+def merge_weight(rule, wind_code, dataset_name):
+    """
+    合并一级文件夹
+    :param rule:
+    :param sector_name:
+    :param dataset_name:
+    :return:
+    """
+    path = os.path.join(__CONFIG_H5_STK_DIR__, rule, 'Symbol.csv')
+    symbols = all_instruments(path)
+
+    path = os.path.join(__CONFIG_H5_STK_DIR__, rule, 'DateTime.csv')
+    DateTime = get_datetime(path)
+
+    df = merge_weight_internal(symbols, DateTime, wind_code)
 
     path = os.path.join(__CONFIG_H5_STK_DIR__, rule, "%s.h5" % dataset_name)
     write_dataframe_set_dtype_remove_head(path, df, None, dataset_name)

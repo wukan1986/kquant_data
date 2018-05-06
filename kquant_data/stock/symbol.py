@@ -120,6 +120,21 @@ def get_symbols_from_wind_code(wind_codes):
     return df
 
 
+def get_symbols_from_wind_code_df(wind_codes):
+    """
+
+    :param wind_codes:
+    :return:
+    """
+    symbols = wind_codes['wind_code'].str.split('.', expand=True)
+    symbols.columns = ['code', 'market']
+    symbols['wind_code'] = wind_codes['wind_code']
+    symbols['market'] = symbols['market'].str.lower()
+    symbols['local_symbol'] = symbols['market'] + symbols['code']
+    symbols['symbol'] = symbols['wind_code'].str.replace('.SH', '.SSE').replace('.SZ', '.SZSE')
+
+    return symbols
+
 def get_folder_symbols(folder, sub_folder):
     path = os.path.join(folder, sub_folder, 'sh')
     df_sh = get_symbols_from_path(path, "SSE")
