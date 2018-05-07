@@ -28,7 +28,7 @@ class MergeBar(object):
         self.instruments = None
         self.instruments_group = None
         self.fields = None
-        self.group_len = 1000
+        self.group_len = 300
         # datetime与bar_size是相关联的
         self.bar_size = 86400
         self.init_datetime()

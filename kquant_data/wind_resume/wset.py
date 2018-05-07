@@ -144,6 +144,8 @@ def move_constituent(path, dst_path):
             curr_df = read_constituent(filepath)
             if curr_df is None:
                 continue
+            if curr_df.empty:
+                continue
             path_list.append(filepath)
             df_list.append(set(curr_df['wind_code']))
 
