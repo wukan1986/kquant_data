@@ -19,7 +19,7 @@ from kquant_data.option.info import read_optioncontractbasicinfo
 
 
 if __name__ == '__main__':
-    # w.start()
+    w.start()
 
     root_path = os.path.join(__CONFIG_H5_OPT_DIR__, 'optioncontractbasicinfo', '510050.SH.csv')
 
@@ -30,12 +30,17 @@ if __name__ == '__main__':
         write_data_dataframe(root_path, df_new)
 
     # 下载新数据，并合并上旧数据
-    if False:
+    if True:
         df_old = read_data_dataframe(root_path)
+        df_old['listed_date'] = pd.to_datetime(df_old['listed_date'])
+        df_old['expire_date'] = pd.to_datetime(df_old['expire_date'])
         df_new = download_optioncontractbasicinfo(w, status='trading')
         df_new = df_new.set_index('wind_code')
-
+        df_new['listed_date'] = pd.to_datetime(df_new['listed_date'])
+        df_new['expire_date'] = pd.to_datetime(df_new['expire_date'])
         df = pd.concat([df_old, df_new])
+        # df = df_old
+
         # 将老数据删除，因为合约可能因为除权而变数据
         df = df[~df.index.duplicated(keep='last')]
         write_data_dataframe(root_path, df)

@@ -13,6 +13,7 @@ import pandas as pd
 from kquant_data.api import get_price
 from kquant_data.option.info import get_opt_info, get_opt_info_filtered_by_month
 from kquant_data.processing.utils import read_fill_from_dir
+from kquant_data.config import __CONFIG_H5_OPT_DIR__, __CONFIG_TDX_STK_DIR__
 
 if __name__ == '__main__':
     # 获取期权基础信息文件
@@ -22,20 +23,22 @@ if __name__ == '__main__':
 
     df_filtered = df_filtered[(df_filtered['listed_date'] <= '2018-04-10')]
 
-    pricing = get_price(list(df_filtered.index), path=r'D:\shqqday', instrument_type='option')
+    path = os.path.join(__CONFIG_TDX_STK_DIR__, 'vipdoc', 'ds', 'lday')
+    pricing = get_price(list(df_filtered.index), path=path, instrument_type='option')
     # print(df)
 
     # 这是期权的价格，不是标的的价格
     Close = pricing['Close']
     # print(Close)
+    path = os.path.join(__CONFIG_H5_OPT_DIR__, 'optionchain', '510050.SH')
 
     df_strike_price = pd.DataFrame(index=Close.index, columns=Close.columns)
-    df_strike_price = read_fill_from_dir(r'D:\DATA_OPT\optionchain\510050.SH\\', 'strike_price', df_strike_price)
+    df_strike_price = read_fill_from_dir(path, 'strike_price', df_strike_price)
     df_strike_price.iloc[-1] = df_info['exercise_price']
     df_strike_price.fillna(method='bfill', inplace=True)
 
     df_multiplier = pd.DataFrame(index=Close.index, columns=Close.columns)
-    df_multiplier = read_fill_from_dir(r'D:\DATA_OPT\optionchain\510050.SH\\', 'multiplier', df_multiplier)
+    df_multiplier = read_fill_from_dir(path, 'multiplier', df_multiplier)
     df_multiplier.iloc[-1] = df_info['contract_unit']
     df_multiplier.fillna(method='bfill', inplace=True)
 

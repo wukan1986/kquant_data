@@ -69,6 +69,9 @@ def func_select_instrument_by_signal(row, field, _open, df_info, month_index, at
     print(date)
     print(px)
     print(infos.shape[0])
+    if infos.shape[0] == 0:
+        row[field] = np.nan
+        return row
 
     infos = infos.reset_index()
     # 选出第二

@@ -25,6 +25,10 @@ def process_dir2file(w, mydir, myfile):
 
             df1 = read_constituent(filepath)
             # print(filepath)
+            if df1 is None:
+                continue
+            if df1.empty:
+                continue
             curr_set = set(df1['wind_code'])
             diff_set = curr_set - all_set
             if len(diff_set) == 0:

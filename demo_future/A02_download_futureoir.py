@@ -21,7 +21,7 @@ if __name__ == '__main__':
     w.start()
 
     # 最新的一天由于没有数据，会导致参与下载，如果中间某一天缺失，会导致大量下载数据，需要排除
-    date_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    date_str = (datetime.today() - timedelta(days=0)).strftime('%Y-%m-%d')
     # date_str = datetime.today().strftime('%Y-%m-%d')
     # IF一类的起始时间是从2010年开始，不能再从2009年开始遍历了
 
