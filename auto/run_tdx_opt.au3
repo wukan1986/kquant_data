@@ -156,8 +156,18 @@ Func ExitMain()
    ControlClick($hMainWnd, "", "[TEXT:退出]")
 EndFunc
 
+Func ExitPop()
+   ; 需要退出下载对话框，否则程序没有完全退出
+   Local $title = "[TITLE:华宝证券; CLASS:#32770]"
+   WinActivate($title)
+   Local $hDlgWnd = WinWaitActive($title)
+   WinClose($hDlgWnd)
+   WinWaitClose($hDlgWnd)
+EndFunc
+
 
 $hMainWnd = RunMain()
+ExitPop()
 PopOptionDlg($hMainWnd)
 WaitOptionDlg()
 PopDownloadDlg($hMainWnd)
