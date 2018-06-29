@@ -4,6 +4,7 @@
 下载合约信息
 """
 from WindPy import w
+import sys
 import os
 import pandas as pd
 from kquant_data.wind.wss import download_ipo_last_trade_trading
@@ -11,6 +12,14 @@ from kquant_data.xio.csv import write_data_dataframe, read_data_dataframe
 from kquant_data.config import __CONFIG_H5_FUT_SECTOR_DIR__
 from kquant_data.wind.wset import read_constituent
 
+
+# 解决Python 3.6的pandas不支持中文路径的问题
+print(sys.getfilesystemencoding())  # 查看修改前的
+try:
+    sys._enablelegacywindowsfsencoding()  # 修改
+    print(sys.getfilesystemencoding())  # 查看修改后的
+except:
+    pass
 
 def process_dir2file(w, mydir, myfile):
     df = read_data_dataframe(myfile)
