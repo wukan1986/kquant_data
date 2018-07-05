@@ -6,7 +6,7 @@ REM 先打开通达信，下载日线和5分钟数据
 REM https://www.autoitscript.com/site/autoit/downloads/
 REM https://www.autoitscript.com/cgi-bin/getfile.pl?autoit3/autoit-v3-setup.exe
 REM 由于最新版通达信不能在虚拟机中运行，只能安装2017年6月份以前版本
-"D:\Program Files (x86)\AutoIt3\autoit3.exe" /ErrorStdOut "%~dp0\run_tdx.au3" 
+"D:\Program Files (x86)\AutoIt3\autoit3.exe" /ErrorStdOut "%~dp0\run_tdx_stk.au3" 
 
 
 REM 导出除权数据

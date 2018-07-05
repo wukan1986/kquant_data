@@ -3,14 +3,16 @@
 $hMainWnd = RunMain()
 ExitPop()
 ExitPop2()
-PopOptionDlg($hMainWnd)
-WaitOptionDlg()
+;PopOptionDlg($hMainWnd)
+;WaitOptionDlg()
 PopDownloadDlg($hMainWnd)
-SetCheckDownloadDlg_OPT()
+SetCheckDownloadDlg_STK()
 ClickDownloadDlg()
 WaitDownloadDlg()
 ExitMain()
 
 Exit(1)
+
+
 
 
