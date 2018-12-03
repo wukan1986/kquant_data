@@ -32,7 +32,7 @@ def read_optioncontractbasicinfo(path):
     :return:
     """
     df = read_data_dataframe(path)
-    df_extract1 = df['trade_code'].str.extract('(\d{6})([CP])(\d{4})(\D)\d{5}', expand=True)
+    df_extract1 = df['trade_code'].str.extract('(\d{6})([CP])(\d{4})(\D)\d{4, 5}', expand=True)
     df_extract1.columns = ['option_mark_code', 'call_or_put', 'limit_month', 'limit_month_m']
     df_extract1['limit_month'] = df_extract1['limit_month'].astype(int)
     # 这个以后再拼接也成
