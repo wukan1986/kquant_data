@@ -20,16 +20,16 @@ import re
 CZCE_pattern = re.compile(r'(\D{1,2})(\d{0,1})(\d{3})(.*)')
 
 CFE = ['IF', 'IC', 'IH', 'T', 'TF', 'AF', 'EF', 'TS', 'TT']
-SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', 'bu', 'ru']  # , 'im'这个只是指数
+SHF = ['cu', 'al', 'zn', 'pb', 'ni', 'sn', 'au', 'ag', 'rb', 'wr', 'hc', 'fu', 'bu', 'ru', 'sp']  # , 'im'这个只是指数
 CZC = ['SR', 'CF', 'ZC', 'FG', 'TA', 'WH', 'PM', 'RI', 'LR', 'JR', 'RS', 'OI', 'RM', 'SF', 'SM', 'MA', 'WT', 'WS', 'RO',
-       'ER', 'ME', 'TC', 'CY', 'AP']
-DCE = ['m', 'y', 'a', 'b', 'p', 'c', 'cs', 'jd', 'fb', 'bb', 'l', 'v', 'pp', 'j', 'jm', 'i']
-INE = ['sc']
+       'ER', 'ME', 'TC', 'CY', 'AP', 'JR', 'UR']
+DCE = ['m', 'y', 'a', 'b', 'p', 'c', 'cs', 'jd', 'fb', 'bb', 'l', 'v', 'pp', 'j', 'jm', 'i', 'eg', 'rr']
+INE = ['sc', 'nr']
 
 # 不活跃的合约
 InactiveProducts = ['b', 'fu', 'wr', 'JR', 'bb', 'LR', 'fb', 'RI', 'PM', 'RS', 'SF', 'SM']
 # 改名前的合约或过期的合约
-ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'TS', 'TT', 'im']  # 从AF开始的几个是没有上市的
+ExpiredProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC', 'AF', 'EF', 'im']  # 从AF开始的几个是没有上市的
 # 有夜盘的
 NightProducts = ['RO', 'ER', 'WS', 'ME', 'WT', 'TC']
 
@@ -98,7 +98,6 @@ def CZCE_3to4(symbol3, y3=1):
     num1 = match.group(2)
     if len(num1) > 0:
         return symbol3
-
     return "%s%d%s%s" % (match.group(1), y3, match.group(3), match.group(4))
 
 
@@ -143,3 +142,4 @@ if __name__ == '__main__':
     print(x)
     print(CZCE_3to4('RB807'))
     print(CZCE_3to4('RB807.CZC'))
+    print(CZCE_3to4('RB007.CZC'))
